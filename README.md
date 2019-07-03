@@ -9,4 +9,6 @@ It used latest components for it's execution as below:
 (e) Data binding
 (f) Recyler View List with Pagination
 
+It also uses Google map that uses order item's location and show them with marker on it.
+
 These components makes this code structure roboust, clean and efficient.
