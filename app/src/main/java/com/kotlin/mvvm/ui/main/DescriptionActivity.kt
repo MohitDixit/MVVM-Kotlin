@@ -95,7 +95,6 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setUpViews(descriptionOrderBinding: OrderDescriptionBinding) {
 
         val imageView = descriptionOrderBinding.orderImage
-        val textView = descriptionOrderBinding.orderDescription
         val obj = intent.extras?.get("order_list") as List<OrderData>
 
         mainActivityViewModel.textDescription = obj.get(0).description
@@ -103,7 +102,7 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
         Picasso.with(this).load(obj.get(0).imageUrl).resize(120, 60).into(imageView);
 
 
-        val mapView = MapFragment.newInstance()// fragmentManager.findFragmentById(R.id.mapFragment) as MapView
+        val mapView = MapFragment.newInstance()
         orderList = obj
         position = 0
         mapView.getMapAsync(this)

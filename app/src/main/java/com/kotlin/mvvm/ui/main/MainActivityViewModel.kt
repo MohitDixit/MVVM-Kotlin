@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.repository.OrderListRepository
-import com.kotlin.mvvm.util.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
@@ -15,9 +14,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(
-    private val orderListRepository: OrderListRepository,
-    private val schedulerProvider: SchedulerProvider
-) :
+    private val orderListRepository: OrderListRepository) :
     ViewModel() {
 
     var context: Context? = null;

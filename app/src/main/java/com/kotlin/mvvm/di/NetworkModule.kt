@@ -10,8 +10,6 @@ import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import dagger.Module
 import dagger.Provides
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -21,7 +19,6 @@ import com.kotlin.mvvm.api.ApiInterface
 import com.kotlin.mvvm.repository.OrderDao
 import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.ui.main.MainActivityViewModelFactory
-import com.kotlin.mvvm.util.SchedulerProvider
 import com.kotlin.mvvm.util.Utils
 import java.io.File
 import java.util.*
@@ -31,9 +28,6 @@ import javax.inject.Singleton
 @Module
 class NetworkModule(private val app: Application) {
 
-    @Provides
-    @Singleton
-    fun provideSchedulerProvider() = SchedulerProvider(Schedulers.io(), AndroidSchedulers.mainThread())
 
     @Provides
     @Singleton
