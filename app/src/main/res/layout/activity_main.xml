@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+                name="mainActivityViewModel"
+                type="com.kotlin.mvvm.ui.main.MainActivityViewModel"/>
+    </data>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+        />
+
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:layout_marginTop="10dp"
+                                                           android:id="@+id/orderListView"/>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <ProgressBar android:layout_width="wrap_content" android:layout_height="wrap_content"
+                         android:visibility="gone"
+                         android:id="@+id/progressBar"
+                         android:layout_gravity="center"/>
+            <ProgressBar android:layout_width="wrap_content" android:layout_height="wrap_content"
+                         android:visibility="gone"
+                         android:id="@+id/progressBarBottom"
+                         android:layout_margin="@dimen/dp10"
+                         android:layout_gravity="bottom|center"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+</layout>

@@ -4,14 +4,13 @@ import com.kotlin.mvvm.ui.main.DescriptionActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import com.kotlin.mvvm.ui.main.MainActivity
-import com.kotlin.mvvm.ui.main.di.MainActivityModule
 
 @Module
 abstract class ActivityBuilder {
 
-    @ContributesAndroidInjector(modules = arrayOf(MainActivityModule::class))
+    @ContributesAndroidInjector
     abstract fun bindMainActivity(): MainActivity
 
-    @ContributesAndroidInjector(modules = arrayOf(MainActivityModule::class))
+    @ContributesAndroidInjector
     abstract fun bindDescriptionActivity(): DescriptionActivity
 }

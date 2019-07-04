@@ -1,12 +1,10 @@
 package com.kotlin.mvvm.api.model
 
-
 import androidx.room.*
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 import androidx.room.Embedded
-
 
 @Entity
 class OrderData : Serializable {
@@ -32,7 +30,7 @@ class OrderData : Serializable {
     @Embedded
     var location: Location? = null
 
-    class Location() : Serializable {
+    class Location : Serializable {
 
         @SerializedName("lat")
         @Expose
@@ -45,9 +43,6 @@ class OrderData : Serializable {
         @SerializedName("address")
         @Expose
         var address: String? = null
-
-
     }
-
 }
 

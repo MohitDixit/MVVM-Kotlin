@@ -1,10 +1,8 @@
 package com.kotlin.mvvm.repository
 
-
 import androidx.room.*
 import com.kotlin.mvvm.api.model.OrderData
 import io.reactivex.Single
-
 
 @Dao
 interface OrderDao {
@@ -14,9 +12,6 @@ interface OrderDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(item: OrderData)
-
-    @Delete
-    fun delete(item: OrderData)
 
     @Query("DELETE FROM `orderdata`")
     fun nukeTable()

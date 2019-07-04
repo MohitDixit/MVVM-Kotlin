@@ -1,7 +1,7 @@
 package com.kotlin.mvvm.ui.main
 
 import android.content.Context
-import android.widget.Toast
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,14 +14,12 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(
-    private val orderListRepository: OrderListRepository) :
+    private val orderListRepository: OrderListRepository
+) :
     ViewModel() {
 
-    var context: Context? = null;
-
-    var textData: String? = "My Orders"
-    var textDetail: String? = "Order Details"
     var textDescription: String? = "Sample Item"
+    var imageUrl: String? = null
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
     var orderListError: MutableLiveData<String> = MutableLiveData()
@@ -64,15 +62,5 @@ class MainActivityViewModel @Inject constructor(
             .debounce(400, TimeUnit.MILLISECONDS)
             .subscribe(disposableObserver)
     }
-
-    fun disposeElements() {
-        if (!disposableObserver.isDisposed) disposableObserver.dispose()
-    }
-
-
-    fun onClickedCellAt(position: Int) {
-        Toast.makeText(context, "Position" + position + "is clicked", Toast.LENGTH_SHORT).show();
-    }
-
 
 }

@@ -1,6 +1,7 @@
 package com.kotlin.mvvm.ui.main
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
@@ -8,7 +9,6 @@ import com.kotlin.mvvm.R
 import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.databinding.OrderDescriptionBinding
 import com.google.android.gms.maps.*
-import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -17,21 +17,27 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
+import com.kotlin.mvvm.BuildConfig
 
 
 class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
-    var orderList: List<OrderData>? = null
-    var position: Int? = 0
+
+    private val compositeDisposable by lazy { CompositeDisposable() }
+    @Inject
+    lateinit var mainActivityViewModel: MainActivityViewModel
+
+    private var orderList: List<OrderData>? = null
+    private var position: Int? = 0
+
     @Inject
     lateinit var mainActivityViewModelFactory: MainActivityViewModelFactory
 
     override fun onMapReady(p0: GoogleMap?) {
 
-        // create marker
         val marker =
-            position?.let {
+            position?.let { it ->
                 orderList?.get(it)?.location?.lng?.let {
-                    orderList!!.get(position!!).location!!.lat?.let { it1 ->
+                    orderList!![position!!].location!!.lat?.let { it1 ->
                         LatLng(
                             it1.toDouble(),
                             it.toDouble()
@@ -40,42 +46,35 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
                 }?.let {
                     MarkerOptions().position(
                         it
-                    ).title("Order Location")
+                    ).title(orderList!!.get(0).location!!.address)
                 }
             }
 
-        // Changing marker icon
         marker?.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
 
-        // adding marker
         p0?.addMarker(marker)
         val cameraPosition = CameraPosition.Builder()
             .target(position?.let {
                 orderList?.get(it)?.location?.lat?.let {
-                    orderList!!.get(position!!).location?.lng?.let { it1 ->
+                    orderList!![position!!].location?.lng?.let { it1 ->
                         LatLng(
                             it.toDouble(),
                             it1.toDouble()
                         )
                     }
                 }
-            }).zoom(12f).build()
+            }).zoom(BuildConfig.zoom).build()
         p0?.animateCamera(
             CameraUpdateFactory
                 .newCameraPosition(cameraPosition)
         )
-        p0?.getUiSettings()?.setZoomControlsEnabled(true)
+        p0?.uiSettings?.isZoomControlsEnabled = true
     }
-
-    private val compositeDisposable by lazy { CompositeDisposable() }
-
-    @Inject
-    lateinit var mainActivityViewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.kotlin.mvvm.R.layout.order_description)
-        AndroidInjection.inject(this);
+        setContentView(R.layout.order_description)
+        AndroidInjection.inject(this)
         initDataBinding()
 
     }
@@ -87,26 +86,32 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
         mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory).get(
             MainActivityViewModel::class.java
         )
-        descriptionOrderBinding.setMainActivityViewModel(mainActivityViewModel)
+        descriptionOrderBinding.mainActivityViewModel = mainActivityViewModel
         setUpViews(descriptionOrderBinding)
 
     }
 
     private fun setUpViews(descriptionOrderBinding: OrderDescriptionBinding) {
 
-        val imageView = descriptionOrderBinding.orderImage
-        val obj = intent.extras?.get("order_list") as List<OrderData>
+        val toolbar = descriptionOrderBinding.toolbar
+        toolbar.title = BuildConfig.Order_Details
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mainActivityViewModel.textDescription = obj.get(0).description
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
-        Picasso.with(this).load(obj.get(0).imageUrl).resize(120, 60).into(imageView);
+        val obj = intent.extras?.get(BuildConfig.order_list) as List<OrderData>
 
+        mainActivityViewModel.textDescription = obj[0].description
+        mainActivityViewModel.imageUrl = obj[0].imageUrl
 
         val mapView = MapFragment.newInstance()
         orderList = obj
         position = 0
         mapView.getMapAsync(this)
-        fragmentManager.beginTransaction().replace(R.id.map, mapView).commit();
+        fragmentManager.beginTransaction().replace(R.id.map, mapView).commit()
     }
 
     override fun onDestroy() {

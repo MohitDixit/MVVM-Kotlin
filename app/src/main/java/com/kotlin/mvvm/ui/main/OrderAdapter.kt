@@ -7,19 +7,17 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kotlin.mvvm.api.model.OrderData
-
-
 import android.content.Context
 import android.content.Intent
-
+import com.kotlin.mvvm.BuildConfig
 import com.squareup.picasso.Picasso
 import java.io.Serializable
-
 import java.util.ArrayList
 
 
 class OrderAdapter(private val orderList: List<OrderData>, private val context: Context) :
     RecyclerView.Adapter<OrderAdapter.ItemViewHolder>() {
+
 
     private var orderListItems = ArrayList<OrderData>()
 
@@ -49,13 +47,16 @@ class OrderAdapter(private val orderList: List<OrderData>, private val context: 
     }
 
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        var orderList: List<OrderData>? = null
-        var position: Int? = 0
+        private var orderList: List<OrderData>? = null
+        private var position: Int? = 0
 
         override fun onClick(p0: View?) {
             val clickOrder =
-                Intent(p0?.context, DescriptionActivity::class.java).putExtra("order_list", orderList as Serializable)
-                    .putExtra("position", position)
+                Intent(p0?.context, DescriptionActivity::class.java).putExtra(
+                    BuildConfig.order_list,
+                    orderList as Serializable
+                )
+
             p0?.context?.startActivity(clickOrder)
         }
 
@@ -69,6 +70,7 @@ class OrderAdapter(private val orderList: List<OrderData>, private val context: 
             val imgOrder = itemView.findViewById(com.kotlin.mvvm.R.id.order_image) as ImageView
 
             txtDescription.text = model.description
+
             Picasso.with(context).load(model.imageUrl).resize(120, 60).into(imgOrder)
 
             this.orderList = mutableListOf(model)

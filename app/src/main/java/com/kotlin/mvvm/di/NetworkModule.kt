@@ -2,7 +2,6 @@ package com.kotlin.mvvm.di
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider
-import androidx.room.Room
 import com.kotlin.mvvm.BuildConfig
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
@@ -16,8 +15,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.kotlin.mvvm.api.ApiInterface
-import com.kotlin.mvvm.repository.OrderDao
-import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.ui.main.MainActivityViewModelFactory
 import com.kotlin.mvvm.util.Utils
 import java.io.File
@@ -28,7 +25,6 @@ import javax.inject.Singleton
 @Module
 class NetworkModule(private val app: Application) {
 
-
     @Provides
     @Singleton
     fun provideGson(): Gson {
@@ -38,39 +34,11 @@ class NetworkModule(private val app: Application) {
 
     @Provides
     @Singleton
-    fun provideApplication(): Application = app
-
-    @Provides
-    @Singleton
-    fun provideOrderDatabase(app: Application): OrderListRepository.AppDatabase = Room.databaseBuilder(
-        app,
-        OrderListRepository.AppDatabase::class.java, BuildConfig.DATABASE_NAME
-    )
-        /*.addMigrations(MIGRATION_1_2)*/
-        .fallbackToDestructiveMigration()
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideOrderDao(
-        database: OrderListRepository.AppDatabase
-    ): OrderDao = database.orderDao()
-
-    @Provides
-    @Singleton
-    fun provideMainActivityViewModelFactory(
-        factory: MainActivityViewModelFactory
-    ): ViewModelProvider.Factory = factory
-
-
-    @Provides
-    @Singleton
     fun provideOkHttpClient(application: Application): OkHttpClient {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
         val cacheDir = File(application.cacheDir, UUID.randomUUID().toString())
-        // 10 MiB cache
         val cache = Cache(cacheDir, 10 * 1024 * 1024)
 
         return OkHttpClient.Builder()
@@ -92,6 +60,16 @@ class NetworkModule(private val app: Application) {
             .client(okHttpClient)
             .build().create(ApiInterface::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideApplication(): Application = app
+
+    @Provides
+    @Singleton
+    fun provideMainActivityViewModelFactory(
+        factory: MainActivityViewModelFactory
+    ): ViewModelProvider.Factory = factory
 
     @Provides
     @Singleton

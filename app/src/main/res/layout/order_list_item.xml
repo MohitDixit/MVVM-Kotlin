@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
-              android:layout_margin="10dp"
+              android:layout_margin="@dimen/dp10"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
-    <ImageView android:layout_width="50dp" android:layout_height="50dp"
+    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
                android:id="@+id/order_image"
                android:layout_gravity="center"
-               android:src="@mipmap/ic_launcher"/>
+               android:src="@mipmap/ic_launcher" android:contentDescription="@string/order_image"/>
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:text="Sample Item"
+              android:text="@string/sample_item"
               android:id="@+id/order_description"
-              android:textSize="18sp"
-              android:textColor="#000000"
-              android:layout_margin="10dp"/>
+              android:textSize="@dimen/sp18"
+              android:textColor="@color/color_black"
+              android:layout_margin="@dimen/dp10"/>
 </LinearLayout>

@@ -6,6 +6,7 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import com.kotlin.mvvm.di.DaggerAppComponent
+import com.kotlin.mvvm.di.DatabaseModule
 import com.kotlin.mvvm.di.NetworkModule
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ class AndroidApp : Application(), HasActivityInjector {
         super.onCreate()
 
         DaggerAppComponent.builder()
+            .databaseModule(DatabaseModule())
             .networkModule(NetworkModule(this))
             .build()
             .inject(this)

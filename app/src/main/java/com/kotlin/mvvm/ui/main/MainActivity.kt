@@ -1,78 +1,76 @@
 package com.kotlin.mvvm.ui.main
 
-
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import io.reactivex.disposables.CompositeDisposable
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kotlin.mvvm.databinding.FirstScreenBinding
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.kotlin.mvvm.api.model.OrderData
-import kotlinx.android.synthetic.main.first_screen.*
+import com.kotlin.mvvm.databinding.ActivityMainBinding
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.kotlin.mvvm.BuildConfig
+import com.kotlin.mvvm.BuildConfig.*
+import com.kotlin.mvvm.R
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
-
     private lateinit var mainActivityViewModel: MainActivityViewModel
-
     private var orderAdapter = OrderAdapter(ArrayList(), this)
-
+    private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     @Inject
     lateinit var mainActivityViewModelFactory: MainActivityViewModelFactory
 
     private var isLastPage: Boolean = false
     private var isLoading: Boolean = false
-
     private var offset: Int = 0
-    private var limit: Int = 20
-    private var currentPage: Int = 1
-    private var LIST_SCROLLING: Int = 20
+    private var currentPage: Int = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.kotlin.mvvm.R.layout.first_screen)
-        AndroidInjection.inject(this);
-        initDataBinding();
-
+        setContentView(com.kotlin.mvvm.R.layout.activity_main)
+        AndroidInjection.inject(this)
+        initDataBinding()
         loadData()
-
     }
 
     private fun initDataBinding() {
 
-        val activityMainBinding: FirstScreenBinding =
-            DataBindingUtil.setContentView(this, com.kotlin.mvvm.R.layout.first_screen)
+        val activityMainBinding: ActivityMainBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory).get(
             MainActivityViewModel::class.java
         )
 
-        activityMainBinding.setMainActivityViewModel(mainActivityViewModel)
-
+        activityMainBinding.mainActivityViewModel = mainActivityViewModel
         setUpViews(activityMainBinding)
-
     }
 
-    private fun setUpViews(activityMainBinding: FirstScreenBinding) {
+    private fun setUpViews(activityMainBinding: ActivityMainBinding) {
+
+        val toolbar = activityMainBinding.toolbar
+        toolbar.title = BuildConfig.My_Orders
+        setSupportActionBar(toolbar)
 
         val recyclerView = activityMainBinding.orderListView
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        activityMainBinding.progressBar.setVisibility(View.VISIBLE)
-
+        activityMainBinding.progressBar.visibility = View.VISIBLE
 
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
@@ -80,22 +78,26 @@ class MainActivity : AppCompatActivity() {
                     val position = orderAdapter.itemCount
                     orderAdapter.addOrders(it)
                     recyclerView.adapter = orderAdapter
-                    recyclerView.scrollToPosition(position - LIST_SCROLLING)
+                    recyclerView.scrollToPosition(position - BuildConfig.listscrolling)
                 }
             })
 
         mainActivityViewModel.orderListError().observe(this, Observer<String> {
             if (it != null) {
-                Toast.makeText(this, "Some error occured", Toast.LENGTH_SHORT).show()
+                showErrorAlert()
             }
         })
 
         mainActivityViewModel.orderListLoader().observe(this, Observer<Boolean> {
-            if (it == false) progressBar.visibility = View.GONE
+            if (it == false) {
+                progressBar.visibility = View.GONE
+                progressBarBottom.visibility = View.GONE
+                mSwipeRefreshLayout?.isRefreshing = false
+            }
+
         })
 
-
-        recyclerView?.addOnScrollListener(object :
+        recyclerView.addOnScrollListener(object :
             PaginationScrollListener(recyclerView.layoutManager as LinearLayoutManager) {
             override fun isLastPage(): Boolean {
                 return isLastPage
@@ -108,29 +110,60 @@ class MainActivity : AppCompatActivity() {
             override fun loadMoreItems() {
                 isLoading = true
 
+
                 if (!isLastPage()) {
                     isLoading = false
                     offset++
+                    progressBarBottom.visibility = View.VISIBLE
 
                     loadData()
 
                 }
-
             }
         })
+
+        mSwipeRefreshLayout = swipe_container as SwipeRefreshLayout
+        mSwipeRefreshLayout!!.setOnRefreshListener(this)
+        mSwipeRefreshLayout!!.setColorSchemeResources(
+            R.color.colorPrimary,
+            android.R.color.holo_green_dark,
+            android.R.color.holo_orange_dark,
+            android.R.color.holo_blue_dark
+        )
     }
 
     private fun loadData() {
 
         val job = Job()
-
         val coroutineScope = CoroutineScope(job + Dispatchers.Main)
 
         coroutineScope.launch {
-            mainActivityViewModel.loadOrderList(offset, /*currentPage **/ limit)
+            mainActivityViewModel.loadOrderList(offset * limit, /*currentPage **/ limit)
             currentPage++
         }
+    }
 
+    override fun onRefresh() {
+        loadData()
+    }
+
+    private fun showErrorAlert() {
+
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setMessage("Some error occurred, Do you want to reload ?")
+            .setCancelable(false)
+
+            .setPositiveButton("Proceed", DialogInterface.OnClickListener { dialog, id ->
+                loadData()
+            })
+
+            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, id ->
+                dialog.cancel()
+            })
+
+        val alert = dialogBuilder.create()
+        alert.setTitle(getString(R.string.app_name))
+        alert.show()
     }
 
     override fun onDestroy() {
@@ -138,7 +171,6 @@ class MainActivity : AppCompatActivity() {
         compositeDisposable.clear()
         compositeDisposable.dispose()
     }
-
 
 }
 
