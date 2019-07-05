@@ -1,6 +1,8 @@
 package com.kotlin.mvvm.di
 
 import android.app.Application
+import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.kotlin.mvvm.BuildConfig
 import com.google.gson.FieldNamingPolicy
@@ -74,4 +76,8 @@ class NetworkModule(private val app: Application) {
     @Provides
     @Singleton
     fun provideUtils(): Utils = Utils(app)
+
+    @Provides
+    @Singleton
+    fun provideActivity(): Context = app.applicationContext
 }

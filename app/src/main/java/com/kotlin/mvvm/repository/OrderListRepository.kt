@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class OrderListRepository @Inject constructor(
     private val apiInterface: ApiInterface,
-    private val OrderDao: OrderDao,
+    private val orderDao: OrderDao,
     private val utils: Utils
 ) {
 
@@ -33,13 +33,13 @@ class OrderListRepository @Inject constructor(
         return apiInterface.getJsonResponse(offset, limit)
             .doAfterNext {
                 for (item in it) {
-                    OrderDao.insert(item)
+                    orderDao.insert(item)
                 }
             }
     }
 
     private fun getOrderListFromDb(): Observable<List<OrderData>> {
-        return OrderDao.getAll()
+        return orderDao.getAll()
             .toObservable()
 
     }

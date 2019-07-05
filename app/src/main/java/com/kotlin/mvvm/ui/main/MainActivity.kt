@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -24,6 +23,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.BuildConfig.*
 import com.kotlin.mvvm.R
+import com.kotlin.mvvm.api.ApiInterface
+import com.kotlin.mvvm.util.Utils
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private var orderAdapter = OrderAdapter(ArrayList(), this)
     private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     @Inject
-    lateinit var mainActivityViewModelFactory: MainActivityViewModelFactory
+    lateinit var apiInterface: ApiInterface
 
     private var isLastPage: Boolean = false
     private var isLoading: Boolean = false
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.kotlin.mvvm.R.layout.activity_main)
+        setContentView(R.layout.activity_main)
         AndroidInjection.inject(this)
         initDataBinding()
         loadData()
@@ -53,12 +55,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         val activityMainBinding: ActivityMainBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory).get(
-            MainActivityViewModel::class.java
-        )
+        mainActivityViewModel =
+            ViewModelProviders.of(this, MainActivityViewModelFactory(this, apiInterface, Utils(this))).get(
+                MainActivityViewModel::class.java
+            )
 
         activityMainBinding.mainActivityViewModel = mainActivityViewModel
         setUpViews(activityMainBinding)
+
     }
 
     private fun setUpViews(activityMainBinding: ActivityMainBinding) {
@@ -72,13 +76,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         activityMainBinding.progressBar.visibility = View.VISIBLE
 
+        orderAdapter.setViewModel(mainActivityViewModel)
+
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
                 if (it != null) {
                     val position = orderAdapter.itemCount
                     orderAdapter.addOrders(it)
                     recyclerView.adapter = orderAdapter
-                    recyclerView.scrollToPosition(position - BuildConfig.listscrolling)
                 }
             })
 
@@ -146,6 +151,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         loadData()
     }
+
 
     private fun showErrorAlert() {
 

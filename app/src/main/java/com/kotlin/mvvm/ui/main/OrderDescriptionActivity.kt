@@ -1,7 +1,6 @@
 package com.kotlin.mvvm.ui.main
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
@@ -12,15 +11,16 @@ import com.google.android.gms.maps.*
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
-
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.kotlin.mvvm.BuildConfig
+import com.kotlin.mvvm.api.ApiInterface
+import com.kotlin.mvvm.util.Utils
 
 
-class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
+class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
     @Inject
@@ -30,9 +30,9 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
     private var position: Int? = 0
 
     @Inject
-    lateinit var mainActivityViewModelFactory: MainActivityViewModelFactory
+    lateinit var apiInterface: ApiInterface
 
-    override fun onMapReady(p0: GoogleMap?) {
+    override fun onMapReady(googleMap: GoogleMap?) {
 
         val marker =
             position?.let { it ->
@@ -46,13 +46,13 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
                 }?.let {
                     MarkerOptions().position(
                         it
-                    ).title(orderList!!.get(0).location!!.address)
+                    ).title(orderList!![0].location!!.address)
                 }
             }
 
         marker?.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
 
-        p0?.addMarker(marker)
+        googleMap?.addMarker(marker)
         val cameraPosition = CameraPosition.Builder()
             .target(position?.let {
                 orderList?.get(it)?.location?.lat?.let {
@@ -64,11 +64,11 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }).zoom(BuildConfig.zoom).build()
-        p0?.animateCamera(
+        googleMap?.animateCamera(
             CameraUpdateFactory
                 .newCameraPosition(cameraPosition)
         )
-        p0?.uiSettings?.isZoomControlsEnabled = true
+        googleMap?.uiSettings?.isZoomControlsEnabled = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,13 +81,15 @@ class DescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun initDataBinding() {
 
-        val descriptionOrderBinding: OrderDescriptionBinding =
+        val orderDescriptionActivity: OrderDescriptionBinding =
             DataBindingUtil.setContentView(this, R.layout.order_description)
-        mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory).get(
-            MainActivityViewModel::class.java
-        )
-        descriptionOrderBinding.mainActivityViewModel = mainActivityViewModel
-        setUpViews(descriptionOrderBinding)
+
+        mainActivityViewModel =
+            ViewModelProviders.of(this, MainActivityViewModelFactory(this, apiInterface, Utils(this))).get(
+                MainActivityViewModel::class.java
+            )
+        orderDescriptionActivity.mainActivityViewModel = mainActivityViewModel
+        setUpViews(orderDescriptionActivity)
 
     }
 

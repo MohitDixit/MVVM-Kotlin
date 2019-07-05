@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_margin="@dimen/dp10"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal" android:layout_margin="@dimen/dp10">
     <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
                android:id="@+id/order_image"
                android:layout_gravity="center"
                android:src="@mipmap/ic_launcher" android:contentDescription="@string/order_image"/>
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:text="@string/sample_item"
+              android:text=""
               android:id="@+id/order_description"
               android:textSize="@dimen/sp18"
               android:textColor="@color/color_black"

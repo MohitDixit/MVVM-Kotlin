@@ -1,6 +1,5 @@
 package com.kotlin.mvvm.ui.main
 
-import android.content.Context
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +17,7 @@ class MainActivityViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    var textDescription: String? = "Sample Item"
+    var textDescription: String? = null
     var imageUrl: String? = null
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()

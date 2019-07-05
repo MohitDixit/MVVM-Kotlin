@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.kotlin.mvvm">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
             android:name="com.kotlin.mvvm.AndroidApp"
             android:allowBackup="true"
@@ -19,13 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.kotlin.mvvm.ui.main.DescriptionActivity"/>
+        <activity android:name="com.kotlin.mvvm.ui.main.OrderDescriptionActivity"/>
         <meta-data
                 android:name="com.google.android.gms.version"
-                android:value="@integer/google_play_services_version" />
+                android:value="@integer/google_play_services_version"/>
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
-                android:value="@string/google_maps_key" />
+                android:value="@string/google_maps_key"/>
     </application>
 
 </manifest>
