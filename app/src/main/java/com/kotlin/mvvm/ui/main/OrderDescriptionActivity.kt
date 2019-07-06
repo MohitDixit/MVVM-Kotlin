@@ -104,13 +104,12 @@ class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
             onBackPressed()
         }
 
-        val obj = intent.extras?.get(BuildConfig.order_list) as List<OrderData>
+        val orderData = intent.extras?.get(BuildConfig.order_list) as List<OrderData>
 
-        mainActivityViewModel.textDescription = obj[0].description
-        mainActivityViewModel.imageUrl = obj[0].imageUrl
+        mainActivityViewModel.setOrderValue(orderData[0])
 
         val mapView = MapFragment.newInstance()
-        orderList = obj
+        orderList = orderData
         position = 0
         mapView.getMapAsync(this)
         fragmentManager.beginTransaction().replace(R.id.map, mapView).commit()

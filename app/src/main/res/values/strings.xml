@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">MVVM Kotlin</string>
     <string name="order_image">Order Image</string>
-    <string name="sample_item">Sample Item</string>
-    <string name="error_text">Some error occurred</string>
+    <string name="proceed">Proceed</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_retry_string">Some error occurred, Do you want to reload ?</string>
+    <string name="order_data">order data</string>
 </resources>

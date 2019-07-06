@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:bind="http://schemas.android.com/apk/res-auto">
-
     <data>
 
         <variable
@@ -15,30 +14,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
         />
-
         <FrameLayout
                 android:id="@+id/map"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp300"/>
-        <!--<include
+        <include
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp10"
-                layout="@layout/order_list_item"/>-->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal" android:layout_margin="@dimen/dp10">
-            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                       android:id="@+id/order_image"
-                       android:layout_gravity="center"
-                       bind:imageUrl="@{mainActivityViewModel.imageUrl}"
-                       android:src="@mipmap/ic_launcher" android:contentDescription="@string/order_image"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                      android:text="@{mainActivityViewModel.textDescription}"
-                      android:id="@+id/order_description"
-                      android:textSize="@dimen/sp18"
-                      android:textColor="@color/color_black"
-                      android:layout_margin="@dimen/dp10"/>
-        </LinearLayout>
+                bind:mainActivityViewModel="@{mainActivityViewModel}"
+                layout="@layout/order_list_item"/>
     </LinearLayout>
 </layout>

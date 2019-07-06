@@ -37,6 +37,11 @@ class MainActivityViewModel @Inject constructor(
         return orderListLoader
     }
 
+    fun setOrderValue(orderData: OrderData) {
+        this.imageUrl = orderData.imageUrl
+        this.textDescription = orderData.description
+    }
+
     fun loadOrderList(offset: Int, limit: Int) {
 
         disposableObserver = object : DisposableObserver<List<OrderData>>() {

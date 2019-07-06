@@ -3,20 +3,18 @@ package com.kotlin.mvvm.ui.main
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kotlin.mvvm.api.model.OrderData
-import android.content.Context
 import android.content.Intent
+import androidx.databinding.DataBindingUtil
 import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.R
-import com.squareup.picasso.Picasso
+import com.kotlin.mvvm.databinding.OrderListItemBinding
 import java.io.Serializable
 import java.util.ArrayList
 
 
-class OrderAdapter(private val orderList: List<OrderData>, private val context: Context) :
+class OrderAdapter(private val orderList: List<OrderData>) :
     RecyclerView.Adapter<OrderAdapter.ItemViewHolder>() {
 
     private var mainActivityViewModel: MainActivityViewModel? = null
@@ -28,13 +26,14 @@ class OrderAdapter(private val orderList: List<OrderData>, private val context: 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.order_list_item, parent, false)
-        return ItemViewHolder(view)
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding =
+            DataBindingUtil.inflate<OrderListItemBinding>(layoutInflater, R.layout.order_list_item, parent, false)
+        return ItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bindItems(orderList[position], context, position, mainActivityViewModel)
+        holder.bindItems(orderList[position], position, mainActivityViewModel)
 
     }
 
@@ -53,7 +52,8 @@ class OrderAdapter(private val orderList: List<OrderData>, private val context: 
     }
 
 
-    class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    class ItemViewHolder(private val binding: OrderListItemBinding) : RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
         private var orderList: List<OrderData>? = null
         private var position: Int? = 0
 
@@ -70,44 +70,18 @@ class OrderAdapter(private val orderList: List<OrderData>, private val context: 
 
         fun bindItems(
             model: OrderData,
-            context: Context,
             position: Int,
             mainActivityViewModel: MainActivityViewModel?
         ) {
-            val txtDescription =
-                itemView.findViewById(com.kotlin.mvvm.R.id.order_description) as TextView
-            val imgOrder = itemView.findViewById(com.kotlin.mvvm.R.id.order_image) as ImageView
-            /*val orderData = OrderData()
-            orderData.description =  model.description
-            orderData.imageUrl = model.imageUrl*/
-            txtDescription.text = model.description
 
-            // mainActivityViewModel?.textDescription = model.description
-            /// mainActivityViewModel?.imageUrl = model.imageUrl
+            mainActivityViewModel?.setOrderValue(model)
 
-            // binding.mainActivityViewModel = mainActivityViewModel
+            binding.mainActivityViewModel = mainActivityViewModel
+            binding.executePendingBindings()
 
-
-            /*  val activityMainBinding: OrderListItemBinding =
-                  DataBindingUtil.setContentView(context as Activity, R.layout.order_list_item)
-
-
-              val mainActivityViewModel = ViewModelProviders.of(context as FragmentActivity, MainActivityViewModelFactory(context,, Utils(context))).get(
-                  MainActivityViewModel::class.java
-              )
-              activityMainBinding.mainActivityViewModel = mainActivityViewModel
-
-              mainActivityViewModel.textDescription = model.description
-              mainActivityViewModel.imageUrl = model.imageUrl*/
-
-
-
-
-            Picasso.with(context).load(model.imageUrl).resize(120, 60).into(imgOrder)
             this.orderList = mutableListOf(model)
             this.position = position
             itemView.setOnClickListener(this)
-
 
         }
     }

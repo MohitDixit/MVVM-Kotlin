@@ -1,6 +1,5 @@
 package com.kotlin.mvvm.ui.main
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -20,18 +19,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.BuildConfig.*
-import com.kotlin.mvvm.R
 import com.kotlin.mvvm.api.ApiInterface
 import com.kotlin.mvvm.util.Utils
 import javax.inject.Inject
+import androidx.recyclerview.widget.DividerItemDecoration
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
     private lateinit var mainActivityViewModel: MainActivityViewModel
-    private var orderAdapter = OrderAdapter(ArrayList(), this)
+    private var orderAdapter = OrderAdapter(ArrayList())
     private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     @Inject
     lateinit var apiInterface: ApiInterface
@@ -44,7 +42,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.kotlin.mvvm.R.layout.activity_main)
         AndroidInjection.inject(this)
         initDataBinding()
         loadData()
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun initDataBinding() {
 
         val activityMainBinding: ActivityMainBinding =
-            DataBindingUtil.setContentView(this, R.layout.activity_main)
+            DataBindingUtil.setContentView(this, com.kotlin.mvvm.R.layout.activity_main)
 
         mainActivityViewModel =
             ViewModelProviders.of(this, MainActivityViewModelFactory(this, apiInterface, Utils(this))).get(
@@ -68,12 +66,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun setUpViews(activityMainBinding: ActivityMainBinding) {
 
         val toolbar = activityMainBinding.toolbar
-        toolbar.title = BuildConfig.My_Orders
+        toolbar.title = My_Orders
         setSupportActionBar(toolbar)
 
         val recyclerView = activityMainBinding.orderListView
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-
+        recyclerView.setHasFixedSize(true)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL))
         activityMainBinding.progressBar.visibility = View.VISIBLE
 
         orderAdapter.setViewModel(mainActivityViewModel)
@@ -81,7 +80,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
                 if (it != null) {
-                    val position = orderAdapter.itemCount
                     orderAdapter.addOrders(it)
                     recyclerView.adapter = orderAdapter
                 }
@@ -130,7 +128,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         mSwipeRefreshLayout = swipe_container as SwipeRefreshLayout
         mSwipeRefreshLayout!!.setOnRefreshListener(this)
         mSwipeRefreshLayout!!.setColorSchemeResources(
-            R.color.colorPrimary,
+            com.kotlin.mvvm.R.color.colorPrimary,
             android.R.color.holo_green_dark,
             android.R.color.holo_orange_dark,
             android.R.color.holo_blue_dark
@@ -140,10 +138,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun loadData() {
 
         val job = Job()
-        val coroutineScope = CoroutineScope(job + Dispatchers.Main)
+        val coRoutineScope = CoroutineScope(job + Dispatchers.Main)
 
-        coroutineScope.launch {
-            mainActivityViewModel.loadOrderList(offset * limit, /*currentPage **/ limit)
+        coRoutineScope.launch {
+            mainActivityViewModel.loadOrderList(offset * limit, limit)
             currentPage++
         }
     }
@@ -156,19 +154,19 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun showErrorAlert() {
 
         val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setMessage("Some error occurred, Do you want to reload ?")
+        dialogBuilder.setMessage(getString(com.kotlin.mvvm.R.string.error_retry_string))
             .setCancelable(false)
 
-            .setPositiveButton("Proceed", DialogInterface.OnClickListener { dialog, id ->
+            .setPositiveButton(getString(com.kotlin.mvvm.R.string.proceed)) { _, _ ->
                 loadData()
-            })
+            }
 
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, id ->
+            .setNegativeButton(getString(com.kotlin.mvvm.R.string.cancel)) { dialog, _ ->
                 dialog.cancel()
-            })
+            }
 
         val alert = dialogBuilder.create()
-        alert.setTitle(getString(R.string.app_name))
+        alert.setTitle(getString(com.kotlin.mvvm.R.string.app_name))
         alert.show()
     }
 
