@@ -19,6 +19,8 @@ class MainActivityViewModel @Inject constructor(
 
     var textDescription: String? = null
     var imageUrl: String? = null
+    var offset: Int? = 0
+
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
     var orderListError: MutableLiveData<String> = MutableLiveData()
@@ -42,7 +44,16 @@ class MainActivityViewModel @Inject constructor(
         this.textDescription = orderData.description
     }
 
-    fun loadOrderList(offset: Int, limit: Int) {
+    fun setOffset(size: Int) {
+        offset = size
+    }
+
+
+    fun deleteOrderDB() {
+        orderListRepository.getEmptyDb()
+    }
+
+    fun loadOrderList(offset: Int, limit: Int, isFromDB: Boolean) {
 
         disposableObserver = object : DisposableObserver<List<OrderData>>() {
             override fun onComplete() {
@@ -60,7 +71,7 @@ class MainActivityViewModel @Inject constructor(
             }
         }
 
-        orderListRepository.getOrderList(offset, limit)
+        orderListRepository.getOrderList(offset, limit, isFromDB)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .debounce(400, TimeUnit.MILLISECONDS)

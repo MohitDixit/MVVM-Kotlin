@@ -2,6 +2,7 @@ package com.kotlin.mvvm.ui.main
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import io.reactivex.disposables.CompositeDisposable
 import androidx.databinding.DataBindingUtil
@@ -37,15 +38,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private var isLastPage: Boolean = false
     private var isLoading: Boolean = false
     private var offset: Int = 0
-    private var currentPage: Int = 0
-
+    private var isRefresh: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.kotlin.mvvm.R.layout.activity_main)
         AndroidInjection.inject(this)
         initDataBinding()
-        loadData()
+        loadData(true, isRefresh = false)
     }
 
     private fun initDataBinding() {
@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     }
 
+
     private fun setUpViews(activityMainBinding: ActivityMainBinding) {
 
         val toolbar = activityMainBinding.toolbar
@@ -79,15 +80,26 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
-                if (it != null) {
+                isLoading = false
+                if (it != null && it.isNotEmpty()) {
+                    if (isRefresh) {
+                        mainActivityViewModel.deleteOrderDB()
+                        orderAdapter.notifyDataSetChanged()
+                    }
                     orderAdapter.addOrders(it)
                     recyclerView.adapter = orderAdapter
+                } else if (Utils(this).isConnectedToInternet()) {
+                    loadData(false, isRefresh = false)
+                } else {
+                    activityMainBinding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show()
                 }
             })
 
         mainActivityViewModel.orderListError().observe(this, Observer<String> {
             if (it != null) {
                 showErrorAlert()
+                isLoading = false
             }
         })
 
@@ -96,6 +108,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 progressBar.visibility = View.GONE
                 progressBarBottom.visibility = View.GONE
                 mSwipeRefreshLayout?.isRefreshing = false
+                isLoading = false
             }
 
         })
@@ -111,15 +124,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             }
 
             override fun loadMoreItems() {
-                isLoading = true
-
 
                 if (!isLastPage()) {
-                    isLoading = false
-                    offset++
                     progressBarBottom.visibility = View.VISIBLE
 
-                    loadData()
+                    loadData(true, isRefresh = false)
 
                 }
             }
@@ -135,19 +144,38 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         )
     }
 
-    private fun loadData() {
+    private fun loadData(isFromDB: Boolean, isRefresh: Boolean) {
 
-        val job = Job()
-        val coRoutineScope = CoroutineScope(job + Dispatchers.Main)
-
-        coRoutineScope.launch {
-            mainActivityViewModel.loadOrderList(offset * limit, limit)
-            currentPage++
+        if (!isLoading) {
+            isLoading = true
+            val job = Job()
+            val coRoutineScope = CoroutineScope(job + Dispatchers.Main)
+            if (isRefresh) {
+                offset = 0
+            } else {
+                setOffset()
+            }
+            coRoutineScope.launch {
+                mainActivityViewModel.loadOrderList(
+                    offset
+                    , limit, isFromDB
+                )
+            }
         }
     }
 
+    private fun setOffset() {
+        offset = mainActivityViewModel.offset!!
+    }
+
     override fun onRefresh() {
-        loadData()
+        if (Utils(this).isConnectedToInternet()) {
+            loadData(false, isRefresh = true)
+        } else {
+            mSwipeRefreshLayout?.isRefreshing = false
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
 
@@ -158,7 +186,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             .setCancelable(false)
 
             .setPositiveButton(getString(com.kotlin.mvvm.R.string.proceed)) { _, _ ->
-                loadData()
+                loadData(false, isRefresh = false)
             }
 
             .setNegativeButton(getString(com.kotlin.mvvm.R.string.cancel)) { dialog, _ ->

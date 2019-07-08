@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kotlin.mvvm.api.model.OrderData
 import android.content.Intent
+import android.util.Log
 import androidx.databinding.DataBindingUtil
 import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.R
@@ -44,6 +45,8 @@ class OrderAdapter(private val orderList: List<OrderData>) :
     fun addOrders(orders: List<OrderData>) {
         val initPosition = orderList.size
         orderListItems.addAll(orders)
+        Log.e("list size", orderListItems.size.toString())
+        mainActivityViewModel?.setOffset(orderListItems.size)
         notifyItemRangeInserted(initPosition, orderListItems.size)
     }
 

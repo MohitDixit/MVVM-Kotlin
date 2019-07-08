@@ -7,12 +7,12 @@ import io.reactivex.Single
 @Dao
 interface OrderDao {
 
-    @Query("SELECT * FROM `orderdata`")
-    fun getAll(): Single<List<OrderData>>
+    @Query("SELECT * FROM `orderdata` limit :limit offset :offset")
+    fun getAll(offset: Int, limit: Int): Single<List<OrderData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(item: OrderData)
 
     @Query("DELETE FROM `orderdata`")
-    fun nukeTable()
+    fun nukeTable(): Single<Int>
 }
