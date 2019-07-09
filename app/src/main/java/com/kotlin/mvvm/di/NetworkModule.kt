@@ -1,22 +1,19 @@
 package com.kotlin.mvvm.di
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.kotlin.mvvm.BuildConfig
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import com.kotlin.mvvm.api.ApiInterface
-import com.kotlin.mvvm.ui.main.MainActivityViewModelFactory
+import com.kotlin.mvvm.ui.MainActivityViewModelFactory
 import com.kotlin.mvvm.util.Utils
 import java.io.File
 import java.util.*
@@ -40,24 +37,24 @@ class NetworkModule(private val app: Application) {
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
         val cacheDir = File(application.cacheDir, UUID.randomUUID().toString())
-        val cache = Cache(cacheDir, 10 * 1024 * 1024)
+        val cache = Cache(cacheDir, BuildConfig.cacheSize * BuildConfig.cacheUnit * BuildConfig.cacheUnit)
 
         return OkHttpClient.Builder()
             .cache(cache)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(BuildConfig.connTimeout, TimeUnit.SECONDS)
+            .readTimeout(BuildConfig.rwTimeout, TimeUnit.SECONDS)
+            .writeTimeout(BuildConfig.rwTimeout, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideApiService(gson: Gson, okHttpClient: OkHttpClient): ApiInterface {
+    fun provideApiService(utils: Utils, okHttpClient: OkHttpClient): ApiInterface {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(utils.buildGsonConverterFactory())
+            .addCallAdapterFactory(utils.buildRxJavaCallAdapterFactory())
             .client(okHttpClient)
             .build().create(ApiInterface::class.java)
     }
@@ -72,11 +69,4 @@ class NetworkModule(private val app: Application) {
         factory: MainActivityViewModelFactory
     ): ViewModelProvider.Factory = factory
 
-    @Provides
-    @Singleton
-    fun provideUtils(): Utils = Utils(app)
-
-    @Provides
-    @Singleton
-    fun provideActivity(): Context = app.applicationContext
 }

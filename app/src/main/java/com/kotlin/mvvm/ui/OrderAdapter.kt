@@ -1,4 +1,4 @@
-package com.kotlin.mvvm.ui.main
+package com.kotlin.mvvm.ui
 
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +42,11 @@ class OrderAdapter(private val orderList: List<OrderData>) :
         return orderList.size
     }
 
-    fun addOrders(orders: List<OrderData>) {
+    fun addOrders(orders: List<OrderData>, isRefresh: Boolean) {
         val initPosition = orderList.size
+        if (isRefresh) {
+            orderListItems.clear()
+        }
         orderListItems.addAll(orders)
         Log.e("list size", orderListItems.size.toString())
         mainActivityViewModel?.setOffset(orderListItems.size)
@@ -59,16 +62,21 @@ class OrderAdapter(private val orderList: List<OrderData>) :
         View.OnClickListener {
         private var orderList: List<OrderData>? = null
         private var position: Int? = 0
+        private var isClicked: Boolean = false
 
 
         override fun onClick(view: View?) {
+
             val clickOrder =
-                Intent(view?.context, OrderDescriptionActivity::class.java).putExtra(
+                Intent(view?.context, OrderDetailActivity::class.java).putExtra(
                     BuildConfig.order_list,
                     orderList as Serializable
                 )
 
-            view?.context?.startActivity(clickOrder)
+            if (!isClicked) {
+                view?.context?.startActivity(clickOrder)
+                isClicked = true
+            }
         }
 
         fun bindItems(

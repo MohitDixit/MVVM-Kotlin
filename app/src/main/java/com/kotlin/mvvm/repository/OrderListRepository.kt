@@ -4,8 +4,6 @@ import com.kotlin.mvvm.api.ApiInterface
 import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.util.Utils
 import io.reactivex.Observable
-import io.reactivex.Single
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 import io.reactivex.schedulers.Schedulers
@@ -53,7 +51,7 @@ class OrderListRepository @Inject constructor(
 
     fun getEmptyDb() {
         Completable.fromAction {
-            orderDao.nukeTable()
+            orderDao.emptyTable()
         }
             .subscribeOn(Schedulers.io())
             .subscribe()

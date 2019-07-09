@@ -1,4 +1,4 @@
-package com.kotlin.mvvm.ui.main
+package com.kotlin.mvvm.ui
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView

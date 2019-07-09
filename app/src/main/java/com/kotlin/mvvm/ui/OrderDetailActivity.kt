@@ -1,4 +1,4 @@
-package com.kotlin.mvvm.ui.main
+package com.kotlin.mvvm.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.kotlin.mvvm.R
 import com.kotlin.mvvm.api.model.OrderData
-import com.kotlin.mvvm.databinding.OrderDescriptionBinding
 import com.google.android.gms.maps.*
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -17,15 +16,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.api.ApiInterface
-import com.kotlin.mvvm.util.Utils
+import com.kotlin.mvvm.databinding.OrderDetailBinding
 
 
-class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
+class OrderDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
+    private lateinit var mainActivityViewModel: MainActivityViewModel
     @Inject
-    lateinit var mainActivityViewModel: MainActivityViewModel
-
+    lateinit var mainActivityViewModelFactory: MainActivityViewModelFactory
     private var orderList: List<OrderData>? = null
     private var position: Int? = 0
 
@@ -73,7 +72,7 @@ class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.order_description)
+        setContentView(R.layout.order_detail)
         AndroidInjection.inject(this)
         initDataBinding()
 
@@ -81,21 +80,21 @@ class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun initDataBinding() {
 
-        val orderDescriptionActivity: OrderDescriptionBinding =
-            DataBindingUtil.setContentView(this, R.layout.order_description)
+        val orderDetailBinding: OrderDetailBinding =
+            DataBindingUtil.setContentView(this, R.layout.order_detail)
 
         mainActivityViewModel =
-            ViewModelProviders.of(this, MainActivityViewModelFactory(this, apiInterface, Utils(this))).get(
+            ViewModelProviders.of(this, mainActivityViewModelFactory).get(
                 MainActivityViewModel::class.java
             )
-        orderDescriptionActivity.mainActivityViewModel = mainActivityViewModel
-        setUpViews(orderDescriptionActivity)
+        orderDetailBinding.mainActivityViewModel = mainActivityViewModel
+        setUpViews(orderDetailBinding)
 
     }
 
-    private fun setUpViews(descriptionOrderBinding: OrderDescriptionBinding) {
+    private fun setUpViews(orderDetailBinding: OrderDetailBinding) {
 
-        val toolbar = descriptionOrderBinding.toolbar
+        val toolbar = orderDetailBinding.toolbar
         toolbar.title = BuildConfig.Order_Details
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -108,16 +107,16 @@ class OrderDescriptionActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mainActivityViewModel.setOrderValue(orderData[0])
 
-        val mapView = MapFragment.newInstance()
+        val mapView = SupportMapFragment.newInstance()
         orderList = orderData
         position = 0
         mapView.getMapAsync(this)
-        fragmentManager.beginTransaction().replace(R.id.map, mapView).commit()
+
+        supportFragmentManager.beginTransaction().replace(R.id.map, mapView).commit()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        compositeDisposable.clear()
         compositeDisposable.dispose()
     }
 

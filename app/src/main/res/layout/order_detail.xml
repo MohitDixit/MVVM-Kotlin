@@ -4,7 +4,7 @@
 
         <variable
                 name="mainActivityViewModel"
-                type="com.kotlin.mvvm.ui.main.MainActivityViewModel"/>
+                type="com.kotlin.mvvm.ui.MainActivityViewModel"/>
     </data>
     <LinearLayout
             android:orientation="vertical"
@@ -17,6 +17,7 @@
         <FrameLayout
                 android:id="@+id/map"
                 android:layout_width="match_parent"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_height="@dimen/dp300"/>
         <include
                 android:layout_width="fill_parent"

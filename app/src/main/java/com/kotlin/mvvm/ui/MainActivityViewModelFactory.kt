@@ -1,6 +1,6 @@
-package com.kotlin.mvvm.ui.main
+package com.kotlin.mvvm.ui
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
@@ -12,16 +12,16 @@ import com.kotlin.mvvm.util.Utils
 import javax.inject.Inject
 
 class MainActivityViewModelFactory @Inject constructor(
-    private val context: Context, private val apiInterface: ApiInterface, private val utils: Utils
+    private val app: Application, private val apiInterface: ApiInterface, private val utils: Utils
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
             val db =
-                Room.databaseBuilder(context, AppDatabase::class.java, context.getString(R.string.order_data)).build()
+                Room.databaseBuilder(app, AppDatabase::class.java, app.getString(R.string.order_data)).build()
             val orderListRepository = OrderListRepository(apiInterface, db.orderDao(), utils)
-            return MainActivityViewModel(orderListRepository) as T
+            return MainActivityViewModel(orderListRepository, utils) as T
         }
         throw IllegalArgumentException("Unknown class name")
     }

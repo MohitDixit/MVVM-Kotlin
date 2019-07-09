@@ -5,7 +5,7 @@
 
         <variable
                 name="mainActivityViewModel"
-                type="com.kotlin.mvvm.ui.main.MainActivityViewModel"/>
+                type="com.kotlin.mvvm.ui.MainActivityViewModel"/>
     </data>
     <LinearLayout
             android:orientation="vertical"

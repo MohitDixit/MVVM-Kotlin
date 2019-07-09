@@ -1,9 +1,9 @@
 package com.kotlin.mvvm.di
 
-import com.kotlin.mvvm.ui.main.OrderDescriptionActivity
+import com.kotlin.mvvm.ui.OrderDetailActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import com.kotlin.mvvm.ui.main.MainActivity
+import com.kotlin.mvvm.ui.MainActivity
 
 @Module
 abstract class ActivityBuilder {
@@ -12,5 +12,5 @@ abstract class ActivityBuilder {
     abstract fun bindMainActivity(): MainActivity
 
     @ContributesAndroidInjector
-    abstract fun bindDescriptionActivity(): OrderDescriptionActivity
+    abstract fun bindDescriptionActivity(): OrderDetailActivity
 }
