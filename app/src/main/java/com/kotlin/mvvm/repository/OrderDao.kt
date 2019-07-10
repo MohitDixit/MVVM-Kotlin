@@ -11,7 +11,7 @@ interface OrderDao {
     fun getAll(offset: Int, limit: Int): Single<List<OrderData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(item: OrderData)
+    fun insert(item: List<OrderData>)
 
     @Query("DELETE FROM `orderdata`")
     fun emptyTable(): Single<Int>

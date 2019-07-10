@@ -29,6 +29,7 @@ class MainActivityViewModel @Inject constructor(
     var orderListLoader: MutableLiveData<Boolean> = MutableLiveData()
     private lateinit var disposableObserver: DisposableObserver<List<OrderData>>
 
+
     fun orderListResult(): LiveData<List<OrderData>> {
         return orderListResult
     }

@@ -4,6 +4,5 @@
     <string name="proceed">Proceed</string>
     <string name="cancel">Cancel</string>
     <string name="error_retry_string">Some error occurred, Do you want to reload ?</string>
-    <string name="order_data">order data</string>
     <string name="error_no_internet">No Internet Connection</string>
 </resources>

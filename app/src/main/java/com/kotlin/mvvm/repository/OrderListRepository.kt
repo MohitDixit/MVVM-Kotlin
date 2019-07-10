@@ -34,14 +34,13 @@ class OrderListRepository @Inject constructor(
     }
 
 
-    private fun getDataFromApi(offset: Int, limit: Int): Observable<List<OrderData>> {
+    internal fun getDataFromApi(offset: Int, limit: Int): Observable<List<OrderData>> {
         return apiInterface.getJsonResponse(offset, limit)
             .doAfterNext {
-                for (item in it) {
-                    orderDao.insert(item)
-                }
+                orderDao.insert(it)
             }
     }
+
 
     private fun getOrderListFromDb(offset: Int, limit: Int): Observable<List<OrderData>> {
         return orderDao.getAll(offset, limit)
