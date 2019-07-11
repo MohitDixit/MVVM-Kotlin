@@ -1,8 +1,8 @@
 package com.kotlin.mvvm.ui
 
+
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import io.reactivex.disposables.CompositeDisposable
 import androidx.databinding.DataBindingUtil
@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     }
 
-
     private fun setUpViews() {
 
         val toolbar = toolbar
@@ -83,6 +82,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
                 isLoading = false
+                noOrderTextView.visibility = View.GONE
                 if (it != null && it.isNotEmpty()) {
                     if (isRefresh) {
                         mainActivityViewModel.deleteOrderDB()
@@ -92,7 +92,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 } else if (!utils.isConnectedToInternet()) {
                     progressBar.visibility = View.GONE
                     progressBarBottom.visibility = View.GONE
-                    Toast.makeText(this, getString(R.string.error_no_internet), Toast.LENGTH_SHORT).show()
+                    if (orderAdapter.itemCount == 0) {
+                        noOrderTextView.visibility = View.VISIBLE
+                    } else {
+                        noOrderTextView.visibility = View.GONE
+                    }
+                    utils.showNetworkAlert(this)
                 }
             })
 
@@ -174,7 +179,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             isRefresh = true
         } else {
             mSwipeRefreshLayout?.isRefreshing = false
-            Toast.makeText(this, getString(R.string.error_no_internet), Toast.LENGTH_SHORT).show()
+            utils.showNetworkAlert(this)
         }
 
     }

@@ -17,7 +17,6 @@ class OrderListRepository @Inject constructor(
     private val utils: Utils
 ) {
 
-
     fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Observable<List<OrderData>> {
         val hasConnection = utils.isConnectedToInternet()
         var observableFromApi: Observable<List<OrderData>>? = null
@@ -33,14 +32,14 @@ class OrderListRepository @Inject constructor(
 
     }
 
-
     internal fun getDataFromApi(offset: Int, limit: Int): Observable<List<OrderData>> {
         return apiInterface.getJsonResponse(offset, limit)
             .doAfterNext {
-                orderDao.insert(it)
+                if (it.isNotEmpty()) {
+                    orderDao.insert(it)
+                }
             }
     }
-
 
     private fun getOrderListFromDb(offset: Int, limit: Int): Observable<List<OrderData>> {
         return orderDao.getAll(offset, limit)
@@ -55,6 +54,4 @@ class OrderListRepository @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
-
-
 }

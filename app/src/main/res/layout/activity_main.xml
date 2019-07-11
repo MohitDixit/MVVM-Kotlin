@@ -37,7 +37,11 @@
                          android:id="@+id/progressBarBottom"
                          android:layout_margin="@dimen/dp10"
                          android:layout_gravity="bottom|center"/>
-
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:text="@string/no_order_available" android:layout_gravity="center"
+                      android:id="@+id/noOrderTextView" android:visibility="gone"
+                      android:textSize="@dimen/sp18"
+            />
         </FrameLayout>
 
     </LinearLayout>

@@ -4,5 +4,7 @@
     <string name="proceed">Proceed</string>
     <string name="cancel">Cancel</string>
     <string name="error_retry_string">Some error occurred, Do you want to reload ?</string>
-    <string name="error_no_internet">No Internet Connection</string>
+    <string name="error_no_internet">No Internet Connection, Do you want to connect wifi?</string>
+    <string name="connect_wifi">Connect to Wifi</string>
+    <string name="no_order_available">No Order Available</string>
 </resources>

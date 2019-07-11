@@ -54,6 +54,8 @@ android {
         buildConfigField("String", "order_list", order_list)
         buildConfigField("String", "My_Orders", My_Orders)
         buildConfigField("String", "Order_Details", Order_Details)
+        buildConfigField("String", "at_str", at_str)
+
 
     }
     buildTypes {

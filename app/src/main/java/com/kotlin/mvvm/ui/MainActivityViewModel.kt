@@ -44,13 +44,12 @@ class MainActivityViewModel @Inject constructor(
 
     fun setOrderValue(orderData: OrderData) {
         this.imageUrl = orderData.imageUrl
-        this.textDescription = orderData.description + " at " + orderData.location?.address
+        this.textDescription = orderData.description + BuildConfig.at_str + orderData.location?.address
     }
 
     fun setOffset(size: Int) {
         offset = size
     }
-
 
     fun deleteOrderDB() {
         orderListRepository.getEmptyDb()
@@ -64,11 +63,13 @@ class MainActivityViewModel @Inject constructor(
             }
 
             override fun onNext(orders: List<OrderData>) {
-                if (orders.isNotEmpty()) {
-                    orderListResult.postValue(orders)
-                    orderListLoader.postValue(false)
-                } else if (utils.isConnectedToInternet()) {
-                    loadOrderList(offset, limit, false)
+                orderListResult.postValue(orders)
+                orderListLoader.postValue(false)
+
+                if (isFromDB && orders.isEmpty()) {
+                    if (utils.isConnectedToInternet()) {
+                        loadOrderList(offset, limit, false)
+                    }
                 }
             }
 
@@ -76,6 +77,7 @@ class MainActivityViewModel @Inject constructor(
                 orderListError.postValue(e.message)
                 orderListLoader.postValue(false)
             }
+
         }
 
         orderListRepository.getOrderList(offset, limit, isFromDB)
