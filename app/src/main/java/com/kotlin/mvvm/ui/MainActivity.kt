@@ -81,24 +81,29 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         mainActivityViewModel.orderListResult().observe(this,
             Observer<List<OrderData>> {
-                isLoading = false
-                noOrderTextView.visibility = View.GONE
+
                 if (it != null && it.isNotEmpty()) {
                     if (isRefresh) {
                         mainActivityViewModel.deleteOrderDB()
+                        mainActivityViewModel.insertAfterPullToRefresh(it)
                     }
                     orderAdapter.addOrders(it, isRefresh)
                     recyclerView.adapter = orderAdapter
+
                 } else if (!utils.isConnectedToInternet()) {
                     progressBar.visibility = View.GONE
                     progressBarBottom.visibility = View.GONE
-                    if (orderAdapter.itemCount == 0) {
-                        noOrderTextView.visibility = View.VISIBLE
-                    } else {
-                        noOrderTextView.visibility = View.GONE
-                    }
                     utils.showNetworkAlert(this)
                 }
+
+                if (orderAdapter.itemCount == 0) {
+                    noOrderTextView.visibility = View.VISIBLE
+                } else {
+                    noOrderTextView.visibility = View.GONE
+                }
+
+                isLoading = false
+
             })
 
         mainActivityViewModel.orderListError().observe(this, Observer<String> {
@@ -113,7 +118,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 progressBar.visibility = View.GONE
                 progressBarBottom.visibility = View.GONE
                 mSwipeRefreshLayout?.isRefreshing = false
-                isLoading = false
             }
 
         })
@@ -130,7 +134,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
             override fun loadMoreItems() {
 
-                if (!isLastPage()) {
+                if (!isLastPage() && !isLoading()) {
                     progressBarBottom.visibility = View.VISIBLE
 
                     loadData(true)
@@ -175,8 +179,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         if (utils.isConnectedToInternet()) {
-            loadData(false)
             isRefresh = true
+            loadData(false)
         } else {
             mSwipeRefreshLayout?.isRefreshing = false
             utils.showNetworkAlert(this)

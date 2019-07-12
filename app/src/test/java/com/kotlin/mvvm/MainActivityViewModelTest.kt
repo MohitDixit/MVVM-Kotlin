@@ -7,6 +7,7 @@ import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.ui.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
+import com.nhaarman.mockitokotlin2.verify
 import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Before
@@ -66,6 +67,7 @@ class MainActivityViewModelTest {
 
             Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
             Assert.assertEquals(orderList, this.mainActivityViewModel.orderListResult.value)
+            verify(mainActivityViewModel).loadOrderList(BuildConfig.offset_mock, BuildConfig.limit, isFromDB = false)
         }
     }
 
@@ -90,6 +92,7 @@ class MainActivityViewModelTest {
 
             Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
             Assert.assertEquals(orderList, this.mainActivityViewModel.orderListResult.value)
+            verify(mainActivityViewModel).loadOrderList(BuildConfig.offset_mock, BuildConfig.limit, isFromDB = true)
         }
     }
 

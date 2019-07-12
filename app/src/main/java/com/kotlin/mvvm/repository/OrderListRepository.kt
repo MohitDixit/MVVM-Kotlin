@@ -48,8 +48,14 @@ class OrderListRepository @Inject constructor(
     }
 
     fun getEmptyDb() {
-        Completable.fromAction {
-            orderDao.emptyTable()
+        Completable.fromAction(orderDao::emptyTable)
+            .subscribeOn(Schedulers.single())
+            .subscribe()
+    }
+
+    fun insertAfterPullToRefresh(list: List<OrderData>) {
+        Completable.fromRunnable {
+            orderDao.insert(list)
         }
             .subscribeOn(Schedulers.io())
             .subscribe()

@@ -48,7 +48,6 @@ class OrderAdapter(private val orderList: List<OrderData>) :
             orderListItems.clear()
         }
         orderListItems.addAll(orders)
-        Log.e("list size", orderListItems.size.toString())
         mainActivityViewModel?.setOffset(orderListItems.size)
         notifyItemRangeInserted(initPosition, orderListItems.size)
     }

@@ -14,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.rule.ActivityTestRule
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.action.ViewActions.swipeDown
 import com.kotlin.mvvm.ui.OrderAdapter
 
 
@@ -47,5 +48,10 @@ class MainActivityUITest {
             .perform(click())
 
         onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText("Deliver food to Eric at Mong Kok"/*"Deliver Document to Andrio at Kowloon Tong"*/)))
+    }
+
+    @Test
+    fun pullToRefresh_success(){
+        onView(withId(R.id.swipe_container)).perform(swipeDown())
     }
 }

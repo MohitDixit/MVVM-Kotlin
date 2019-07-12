@@ -14,5 +14,5 @@ interface OrderDao {
     fun insert(item: List<OrderData>)
 
     @Query("DELETE FROM `orderdata`")
-    fun emptyTable(): Single<Int>
+    fun emptyTable()
 }

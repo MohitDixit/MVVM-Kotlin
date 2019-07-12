@@ -23,6 +23,7 @@ class MainActivityViewModel @Inject constructor(
     var textDescription: String? = null
     var imageUrl: String? = null
     var offset: Int? = 0
+    var isLoading: Boolean = false
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
     var orderListError: MutableLiveData<String> = MutableLiveData()
@@ -55,6 +56,11 @@ class MainActivityViewModel @Inject constructor(
         orderListRepository.getEmptyDb()
     }
 
+    fun insertAfterPullToRefresh(list: List<OrderData>) {
+        orderListRepository.insertAfterPullToRefresh(list)
+    }
+
+
     fun loadOrderList(offset: Int, limit: Int, isFromDB: Boolean) {
 
         disposableObserver = object : DisposableObserver<List<OrderData>>() {
@@ -66,16 +72,20 @@ class MainActivityViewModel @Inject constructor(
                 orderListResult.postValue(orders)
                 orderListLoader.postValue(false)
 
-                if (isFromDB && orders.isEmpty()) {
+                if (isFromDB && orders.isEmpty() && !isLoading) {
                     if (utils.isConnectedToInternet()) {
+                        isLoading = true
                         loadOrderList(offset, limit, false)
                     }
+                } else if (orders.isNotEmpty()) {
+                    isLoading = false
                 }
             }
 
             override fun onError(e: Throwable) {
                 orderListError.postValue(e.message)
                 orderListLoader.postValue(false)
+                isLoading = false
             }
 
         }
