@@ -7,4 +7,6 @@
     <string name="error_no_internet">No Internet Connection, Do you want to connect wifi?</string>
     <string name="connect_wifi">Connect to Wifi</string>
     <string name="no_order_available">No Order Available</string>
+    <string name="no_more_order">No more orders available</string>
+    <string name="try_again">Try Again!</string>
 </resources>

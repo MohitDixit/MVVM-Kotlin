@@ -22,7 +22,6 @@ class MainActivityViewModel @Inject constructor(
 
     var textDescription: String? = null
     var imageUrl: String? = null
-    var offset: Int? = 0
     var isLoading: Boolean = false
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
@@ -39,17 +38,13 @@ class MainActivityViewModel @Inject constructor(
         return orderListError
     }
 
-    fun orderListLoader(): LiveData<Boolean> {
-        return orderListLoader
-    }
-
     fun setOrderValue(orderData: OrderData) {
         this.imageUrl = orderData.imageUrl
         this.textDescription = orderData.description + BuildConfig.at_str + orderData.location?.address
     }
 
-    fun setOffset(size: Int) {
-        offset = size
+    fun orderListLoader(): LiveData<Boolean> {
+        return orderListLoader
     }
 
     fun deleteOrderDB() {
@@ -75,11 +70,15 @@ class MainActivityViewModel @Inject constructor(
                 if (isFromDB && orders.isEmpty() && !isLoading) {
                     if (utils.isConnectedToInternet()) {
                         isLoading = true
+
                         loadOrderList(offset, limit, false)
                     }
                 } else if (orders.isNotEmpty()) {
                     isLoading = false
+                } else if(!isFromDB && orders.isEmpty() && isLoading){
+                    isLoading = false
                 }
+
             }
 
             override fun onError(e: Throwable) {

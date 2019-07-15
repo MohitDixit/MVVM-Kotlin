@@ -3,6 +3,7 @@ package com.kotlin.mvvm.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import io.reactivex.disposables.CompositeDisposable
 import androidx.databinding.DataBindingUtil
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private var isLoading: Boolean = false
     private var offset: Int = 0
     private var isRefresh: Boolean = false
+    private var isFromDB: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,17 +92,26 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                     orderAdapter.addOrders(it, isRefresh)
                     recyclerView.adapter = orderAdapter
 
+                    if (!isFromDB) {
+                        showNoOrderViews(false)
+                    }
+                    progressBarBottom.visibility = View.GONE
+
                 } else if (!utils.isConnectedToInternet()) {
                     progressBar.visibility = View.GONE
                     progressBarBottom.visibility = View.GONE
                     utils.showNetworkAlert(this)
+
+                    showNoOrderViews(true)
+
+                } else if (isFromDB && it.isEmpty()) {
+                    isFromDB = false
+                } else if (!isFromDB && it.isEmpty()) {
+                    showNoOrderViews(true)
+                    progressBarBottom.visibility = View.GONE
+
                 }
 
-                if (orderAdapter.itemCount == 0) {
-                    noOrderTextView.visibility = View.VISIBLE
-                } else {
-                    noOrderTextView.visibility = View.GONE
-                }
 
                 isLoading = false
 
@@ -116,7 +127,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         mainActivityViewModel.orderListLoader().observe(this, Observer<Boolean> {
             if (it == false) {
                 progressBar.visibility = View.GONE
-                progressBarBottom.visibility = View.GONE
                 mSwipeRefreshLayout?.isRefreshing = false
             }
 
@@ -135,14 +145,27 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             override fun loadMoreItems() {
 
                 if (!isLastPage() && !isLoading()) {
-                    progressBarBottom.visibility = View.VISIBLE
-
-                    loadData(true)
                     isRefresh = false
+                    loadData(true)
                 }
+            }
+
+            override fun lastPosition() {
             }
         })
 
+        retry_btn.setOnClickListener {
+            if (utils.isConnectedToInternet()) {
+                progressBar.visibility = View.VISIBLE
+                noOrderTextView.visibility = View.GONE
+                retry_btn.visibility = View.GONE
+                isRefresh = true
+                loadData(false)
+            } else {
+                utils.showNetworkAlert(this)
+            }
+
+        }
         mSwipeRefreshLayout = swipe_container as SwipeRefreshLayout
         mSwipeRefreshLayout!!.setOnRefreshListener(this)
         mSwipeRefreshLayout!!.setColorSchemeResources(
@@ -154,9 +177,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun loadData(isFromDB: Boolean) {
-
+        this.isFromDB = isFromDB
         if (!isLoading) {
             isLoading = true
+
+            if (orderAdapter.itemCount == 0) {
+                progressBar.visibility = View.VISIBLE
+                progressBarBottom.visibility = View.GONE
+
+            } else {
+                if (!isRefresh) {
+                    progressBarBottom.visibility = View.VISIBLE
+                }
+                progressBar.visibility = View.GONE
+            }
+
             val job = Job()
             val coRoutineScope = CoroutineScope(job + Dispatchers.Main)
             if (isRefresh) {
@@ -174,7 +209,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setOffset() {
-        offset = mainActivityViewModel.offset!!
+        offset = orderAdapter.itemCount
     }
 
     override fun onRefresh() {
@@ -188,6 +223,19 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     }
 
+    private fun showNoOrderViews(showToast: Boolean) {
+        if (orderAdapter.itemCount == 0) {
+            noOrderTextView.visibility = View.VISIBLE
+            retry_btn.visibility = View.VISIBLE
+        } else {
+            noOrderTextView.visibility = View.GONE
+            retry_btn.visibility = View.GONE
+            if (showToast) {
+                Toast.makeText(this, getString(R.string.no_more_order), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
 
     private fun showErrorAlert() {
 
@@ -196,12 +244,20 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             .setCancelable(false)
 
             .setPositiveButton(getString(R.string.proceed)) { _, _ ->
-                loadData(false)
                 isRefresh = false
+                if (orderAdapter.itemCount == 0) {
+                    progressBar.visibility = View.VISIBLE
+                } else {
+                    progressBar.visibility = View.GONE
+
+                }
+                loadData(false)
             }
 
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.cancel()
+                showNoOrderViews(false)
+                progressBarBottom.visibility = View.GONE
             }
 
         val alert = dialogBuilder.create()

@@ -2,6 +2,5 @@
 <resources>
     <dimen name="dp10">10dp</dimen>
     <dimen name="sp18">18sp</dimen>
-    <dimen name="dp300">300dp</dimen>
     <dimen name="dp100">100dp</dimen>
 </resources>

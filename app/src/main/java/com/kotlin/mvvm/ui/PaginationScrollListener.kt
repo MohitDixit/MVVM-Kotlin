@@ -3,6 +3,7 @@ package com.kotlin.mvvm.ui
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+
 /**
  * Pagination class to add more items to the list when reach the last item.
  */
@@ -34,5 +35,15 @@ abstract class PaginationScrollListener
         }
     }
 
+    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        super.onScrollStateChanged(recyclerView, newState)
+
+        if (!recyclerView.canScrollVertically(1)) {
+            lastPosition()
+        }
+    }
+
     abstract fun loadMoreItems()
+
+    abstract fun lastPosition()
 }
