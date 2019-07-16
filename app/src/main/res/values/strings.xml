@@ -9,8 +9,4 @@
     <string name="no_order_available">No Order Available</string>
     <string name="no_more_order">No more orders available</string>
     <string name="try_again">Try Again!</string>
-
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

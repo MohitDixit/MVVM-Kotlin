@@ -15,7 +15,12 @@ import org.junit.runner.RunWith
 import androidx.test.rule.ActivityTestRule
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.action.ViewActions.swipeDown
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.ui.OrderAdapter
+import com.kotlin.mvvm.util.Utils
+
 
 
 @RunWith(AndroidJUnit4::class)
@@ -44,10 +49,16 @@ class MainActivityUITest {
 
     @Test
     fun recyclerViewListClick_DataCorrect_success() {
-        onView(withId(R.id.orderListView))
-            .perform(click())
 
-        onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText("Deliver food to Eric at Mong Kok"/*"Deliver Document to Andrio at Kowloon Tong"*/)))
+        onView(withId(R.id.orderListView))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<OrderAdapter.ItemViewHolder>(0, click()))
+
+        val listType = object : TypeToken<List<OrderData>>() {
+        }.type
+
+        val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
+
+        onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText(orderList[0].description + BuildConfig.at_str + orderList[0].location?.address)))
     }
 
     @Test

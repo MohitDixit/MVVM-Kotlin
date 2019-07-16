@@ -40,7 +40,7 @@ class OrderListRepository @Inject constructor(
         }
     }
 
-    private fun getOrderListFromDb(offset: Int, limit: Int): Single<List<OrderData>> {
+    internal fun getOrderListFromDb(offset: Int, limit: Int): Single<List<OrderData>> {
         return orderDao.getAll(offset, limit)
     }
 

@@ -8,7 +8,7 @@ import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.ui.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
 import com.nhaarman.mockitokotlin2.verify
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -51,13 +51,8 @@ class MainActivityViewModelTest {
 
             val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
             Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-                return@thenAnswer Observable.just(orderList)
+                return@thenAnswer Single.just(orderList)
             }
-
-            val obs: androidx.lifecycle.Observer<List<OrderData>> =
-                mock(androidx.lifecycle.Observer::class.java) as androidx.lifecycle.Observer<List<OrderData>>
-
-            this.mainActivityViewModel.orderListResult.observeForever(obs)
 
             this.mainActivityViewModel.loadOrderList(BuildConfig.offset_mock, BuildConfig.limit, isFromDB = false)
 
@@ -76,13 +71,8 @@ class MainActivityViewModelTest {
 
             val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
             Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-                return@thenAnswer Observable.just(orderList)
+                return@thenAnswer Single.just(orderList)
             }
-
-            val obs: androidx.lifecycle.Observer<List<OrderData>> =
-                mock(androidx.lifecycle.Observer::class.java) as androidx.lifecycle.Observer<List<OrderData>>
-
-            this.mainActivityViewModel.orderListResult.observeForever(obs)
 
             this.mainActivityViewModel.loadOrderList(BuildConfig.offset_mock, BuildConfig.limit, isFromDB = true)
 

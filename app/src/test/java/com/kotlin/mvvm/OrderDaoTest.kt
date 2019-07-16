@@ -6,9 +6,10 @@ import com.google.gson.reflect.TypeToken
 import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.repository.OrderDao
 import com.kotlin.mvvm.repository.OrderListRepository
+import com.kotlin.mvvm.ui.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
 import com.nhaarman.mockitokotlin2.verify
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,11 +30,18 @@ class OrderDaoTest {
     @Mock
     lateinit var repository: OrderListRepository
 
+    @Mock
+    lateinit var utils: Utils
+
+
+    lateinit var mainActivityViewModel: MainActivityViewModel
+
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         orderDao = Mockito.mock(OrderDao::class.java)
         repository = Mockito.mock(OrderListRepository::class.java)
+        mainActivityViewModel =  MainActivityViewModel(repository, utils)
 
     }
 
@@ -47,7 +55,7 @@ class OrderDaoTest {
 
         val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
         Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-            return@thenAnswer Observable.just(orderList)
+            return@thenAnswer Single.just(orderList)
         }
 
         orderDao.insert(orderList)
@@ -63,8 +71,8 @@ class OrderDaoTest {
         }.type
 
         val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-        Mockito.`when`(this.repository.getOrderList(BuildConfig.offset_mock, BuildConfig.limit, true)).thenAnswer {
-            return@thenAnswer Observable.just(orderList)
+        Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+            return@thenAnswer Single.just(orderList)
         }
 
         orderDao.getAll(BuildConfig.offset_mock, BuildConfig.limit)
@@ -80,8 +88,8 @@ class OrderDaoTest {
         }.type
 
         val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-        Mockito.`when`(this.repository.getOrderList(BuildConfig.offset_mock, BuildConfig.limit, true)).thenAnswer {
-            return@thenAnswer Observable.just(orderList)
+        Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+            return@thenAnswer Single.just(orderList)
         }
 
         orderDao.emptyTable()
