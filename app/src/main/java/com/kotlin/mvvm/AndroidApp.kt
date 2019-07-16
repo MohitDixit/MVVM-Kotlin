@@ -2,12 +2,11 @@ package com.kotlin.mvvm
 
 import android.app.Activity
 import android.app.Application
+import com.kotlin.mvvm.di.ContextModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import com.kotlin.mvvm.di.DaggerAppComponent
-import com.kotlin.mvvm.di.DatabaseModule
-import com.kotlin.mvvm.di.NetworkModule
 import javax.inject.Inject
 
 
@@ -20,8 +19,7 @@ class AndroidApp : Application(), HasActivityInjector {
         super.onCreate()
 
         DaggerAppComponent.builder()
-            .databaseModule(DatabaseModule())
-            .networkModule(NetworkModule(this))
+            .contextModule(ContextModule(this))
             .build()
             .inject(this)
     }

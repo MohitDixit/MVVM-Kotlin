@@ -35,15 +35,5 @@ abstract class PaginationScrollListener
         }
     }
 
-    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-        super.onScrollStateChanged(recyclerView, newState)
-
-        if (!recyclerView.canScrollVertically(1)) {
-            lastPosition()
-        }
-    }
-
     abstract fun loadMoreItems()
-
-    abstract fun lastPosition()
 }

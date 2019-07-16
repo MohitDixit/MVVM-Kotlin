@@ -9,7 +9,7 @@ import com.kotlin.mvvm.util.Utils
 import javax.inject.Inject
 
 class MainActivityViewModelFactory @Inject constructor(
-     private val apiInterface: ApiInterface, private val utils: Utils, private val orderDao: OrderDao
+    private val apiInterface: ApiInterface, private val utils: Utils, private val orderDao: OrderDao
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

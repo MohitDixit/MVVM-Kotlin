@@ -1,7 +1,6 @@
 package com.kotlin.mvvm.util
 
 import android.annotation.TargetApi
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -9,26 +8,19 @@ import android.net.Network
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
-import com.google.gson.Gson
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import androidx.appcompat.app.AppCompatActivity
 import com.kotlin.mvvm.R
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import javax.inject.Inject
 
 
-class Utils @Inject constructor(private val app: Application) {
+class Utils @Inject constructor(private val context: Context) {
 
-
-    fun buildGsonConverterFactory(): GsonConverterFactory {
-        val gson = Gson()
-        return GsonConverterFactory.create(gson)
-    }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Suppress("DEPRECATION", "NAME_SHADOWING")
     fun isConnectedToInternet(): Boolean {
-        val connectivity = app.getSystemService(
+        val connectivity = context.getSystemService(
             Context.CONNECTIVITY_SERVICE
         ) as ConnectivityManager
         val networkInfo: Network?
@@ -54,17 +46,13 @@ class Utils @Inject constructor(private val app: Application) {
         return false
     }
 
-    fun buildRxJavaCallAdapterFactory(): RxJava2CallAdapterFactory {
-        return RxJava2CallAdapterFactory.create()
-    }
-
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     companion object {
         @JvmStatic
-        fun loadJSONFromAssets(utils: Utils): String? {
+        fun loadJSONFromAssets(): String? {
             var json: String? = null
             try {
-                val classLoader = utils.javaClass.classLoader
+                val classLoader = this.javaClass.classLoader
                 val inputStream = classLoader?.getResourceAsStream("mockrepojson.json")
                 val size = inputStream?.available()
                 val buffer = size?.let { ByteArray(it) }
@@ -81,10 +69,9 @@ class Utils @Inject constructor(private val app: Application) {
 
     }
 
+    internal fun showNetworkAlert(activity: AppCompatActivity) {
 
-    internal fun showNetworkAlert(context: Context) {
-
-        val dialogBuilder = AlertDialog.Builder(context)
+        val dialogBuilder = AlertDialog.Builder(activity)
         dialogBuilder.setMessage(context.getString(R.string.error_no_internet))
             .setCancelable(false)
 

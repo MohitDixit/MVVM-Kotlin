@@ -1,6 +1,6 @@
 package com.kotlin.mvvm.di
 
-import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import com.kotlin.mvvm.BuildConfig
 import com.kotlin.mvvm.repository.AppDatabase
@@ -14,8 +14,8 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideOrderDatabase(app: Application): AppDatabase = Room.databaseBuilder(
-        app,
+    fun provideOrderDatabase(context: Context): AppDatabase = Room.databaseBuilder(
+        context,
         AppDatabase::class.java, BuildConfig.DATABASE_NAME
     )
         .fallbackToDestructiveMigration()

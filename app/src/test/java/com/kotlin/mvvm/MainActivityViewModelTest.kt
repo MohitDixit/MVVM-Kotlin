@@ -17,7 +17,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
-import java.util.concurrent.ExecutorService
 
 
 class MainActivityViewModelTest {
@@ -26,8 +25,6 @@ class MainActivityViewModelTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mainActivityViewModel: MainActivityViewModel
-
-    private var executor: ExecutorService? = null
 
     @Mock
     lateinit var utils: Utils
@@ -41,7 +38,6 @@ class MainActivityViewModelTest {
         MockitoAnnotations.initMocks(this)
         repository = mock(OrderListRepository::class.java)
         utils = mock(Utils::class.java)
-        executor = mock(ExecutorService::class.java)
         this.mainActivityViewModel = MainActivityViewModel(repository, utils)
     }
 
@@ -53,7 +49,7 @@ class MainActivityViewModelTest {
             val listType = object : TypeToken<List<OrderData>>() {
             }.type
 
-            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(utils), listType)
+            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
             Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
                 return@thenAnswer Observable.just(orderList)
             }
@@ -78,7 +74,7 @@ class MainActivityViewModelTest {
             val listType = object : TypeToken<List<OrderData>>() {
             }.type
 
-            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(utils), listType)
+            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
             Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
                 return@thenAnswer Observable.just(orderList)
             }

@@ -3,11 +3,11 @@ package com.kotlin.mvvm.repository
 import com.kotlin.mvvm.api.ApiInterface
 import com.kotlin.mvvm.api.model.OrderData
 import com.kotlin.mvvm.util.Utils
-import io.reactivex.Observable
 import javax.inject.Inject
 import javax.inject.Singleton
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.Completable
+import io.reactivex.Single
 
 
 @Singleton
@@ -17,9 +17,9 @@ class OrderListRepository @Inject constructor(
     private val utils: Utils
 ) {
 
-    fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Observable<List<OrderData>> {
+    fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Single<List<OrderData>> {
         val hasConnection = utils.isConnectedToInternet()
-        var observableFromApi: Observable<List<OrderData>>? = null
+        var observableFromApi: Single<List<OrderData>>? = null
         if (!isFromDB) {
             if (hasConnection) {
                 observableFromApi = getDataFromApi(offset, limit)
@@ -27,24 +27,21 @@ class OrderListRepository @Inject constructor(
         }
         val observableFromDb = getOrderListFromDb(offset, limit)
 
-        return if (!isFromDB && hasConnection) Observable.concatArrayEager(observableFromApi, observableFromDb)
-        else observableFromDb
+        return (if (!isFromDB && hasConnection) observableFromApi
+        else observableFromDb)!!
 
     }
 
-    internal fun getDataFromApi(offset: Int, limit: Int): Observable<List<OrderData>> {
-        return apiInterface.getJsonResponse(offset, limit)
-            .doAfterNext {
-                if (it.isNotEmpty()) {
-                    orderDao.insert(it)
-                }
+    internal fun getDataFromApi(offset: Int, limit: Int): Single<List<OrderData>> {
+        return apiInterface.getJsonResponse(offset, limit).doAfterSuccess {
+            if (it.isNotEmpty()) {
+                orderDao.insert(it)
             }
+        }
     }
 
-    private fun getOrderListFromDb(offset: Int, limit: Int): Observable<List<OrderData>> {
+    private fun getOrderListFromDb(offset: Int, limit: Int): Single<List<OrderData>> {
         return orderDao.getAll(offset, limit)
-            .toObservable()
-
     }
 
     fun getEmptyDb() {

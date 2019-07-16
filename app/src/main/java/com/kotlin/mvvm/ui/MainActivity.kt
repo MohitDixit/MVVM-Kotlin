@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL))
-        progressBar.visibility = View.VISIBLE
 
         orderAdapter.setViewModel(mainActivityViewModel)
 
@@ -89,25 +88,31 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                         mainActivityViewModel.deleteOrderDB()
                         mainActivityViewModel.insertAfterPullToRefresh(it)
                     }
-                    orderAdapter.addOrders(it, isRefresh)
+                    val itemPosition = orderAdapter.itemCount
                     recyclerView.adapter = orderAdapter
+                    orderAdapter.addOrders(it, isRefresh)
+                    recyclerView.scrollToPosition(itemPosition)
+
 
                     if (!isFromDB) {
                         showNoOrderViews(false)
                     }
                     progressBarBottom.visibility = View.GONE
+                    progressBar.visibility = View.GONE
+
 
                 } else if (!utils.isConnectedToInternet()) {
                     progressBar.visibility = View.GONE
                     progressBarBottom.visibility = View.GONE
                     utils.showNetworkAlert(this)
 
-                    showNoOrderViews(true)
+                    showNoOrderViews(false)
 
                 } else if (isFromDB && it.isEmpty()) {
                     isFromDB = false
                 } else if (!isFromDB && it.isEmpty()) {
                     showNoOrderViews(true)
+                    progressBar.visibility = View.GONE
                     progressBarBottom.visibility = View.GONE
 
                 }
@@ -126,7 +131,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         mainActivityViewModel.orderListLoader().observe(this, Observer<Boolean> {
             if (it == false) {
-                progressBar.visibility = View.GONE
+                // progressBar.visibility = View.VISIBLE
                 mSwipeRefreshLayout?.isRefreshing = false
             }
 
@@ -148,9 +153,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                     isRefresh = false
                     loadData(true)
                 }
-            }
-
-            override fun lastPosition() {
             }
         })
 

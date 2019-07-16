@@ -6,7 +6,7 @@ import com.kotlin.mvvm.AndroidApp
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AndroidInjectionModule::class, DatabaseModule::class, NetworkModule::class, ActivityBuilder::class])
+@Component(modules = [AndroidInjectionModule::class, ContextModule::class, DatabaseModule::class, NetworkModule::class, ActivityBuilder::class])
 interface AppComponent {
 
     fun inject(app: AndroidApp)
