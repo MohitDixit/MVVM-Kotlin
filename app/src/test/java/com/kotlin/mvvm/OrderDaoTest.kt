@@ -10,6 +10,7 @@ import com.kotlin.mvvm.ui.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
 import com.nhaarman.mockitokotlin2.verify
 import io.reactivex.Single
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,56 +46,73 @@ class OrderDaoTest {
 
     }
 
-
     @Test
     @Throws(Exception::class)
     fun insert() {
 
-        val listType = object : TypeToken<List<OrderData>>() {
-        }.type
+        Runnable {
 
-        val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-        Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-            return@thenAnswer Single.just(orderList)
+            val listType = object : TypeToken<List<OrderData>>() {
+            }.type
+
+            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
+            Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+                return@thenAnswer Single.just(orderList)
+            }
+
+            orderDao.insert(orderList)
+
+            Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
+            Assert.assertEquals(orderList, this.mainActivityViewModel.orderListResult.value)
+
+            verify(orderDao).insert(orderList)
         }
-
-        orderDao.insert(orderList)
-
-        verify(orderDao).insert(orderList)
     }
 
     @Test
     @Throws(Exception::class)
     fun getAll() {
 
-        val listType = object : TypeToken<List<OrderData>>() {
-        }.type
+       Runnable {
 
-        val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-        Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-            return@thenAnswer Single.just(orderList)
-        }
+           val listType = object : TypeToken<List<OrderData>>() {
+           }.type
 
-        orderDao.getAll(BuildConfig.offset_mock, BuildConfig.limit)
+           val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
+           Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+               return@thenAnswer Single.just(orderList)
+           }
 
-        verify(orderDao).getAll(BuildConfig.offset_mock, BuildConfig.limit)
+           orderDao.getAll(BuildConfig.offset_mock, BuildConfig.limit)
+
+           Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
+           Assert.assertEquals(orderList, this.mainActivityViewModel.orderListResult.value)
+
+           verify(orderDao).getAll(BuildConfig.offset_mock, BuildConfig.limit)
+       }
     }
 
     @Test
     @Throws(Exception::class)
     fun empty() {
 
-        val listType = object : TypeToken<List<OrderData>>() {
-        }.type
+        Runnable {
 
-        val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-        Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
-            return@thenAnswer Single.just(orderList)
+            val listType = object : TypeToken<List<OrderData>>() {
+            }.type
+
+            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
+            Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+                return@thenAnswer Single.just(orderList)
+            }
+
+            orderDao.emptyTable()
+
+            Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
+            Assert.assertEquals(0, this.mainActivityViewModel.orderListResult.value?.size)
+
+            verify(orderDao).emptyTable()
         }
-
-        orderDao.emptyTable()
-
-        verify(orderDao).emptyTable()
 
     }
 

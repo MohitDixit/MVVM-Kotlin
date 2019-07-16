@@ -22,7 +22,6 @@ import com.kotlin.mvvm.ui.OrderAdapter
 import com.kotlin.mvvm.util.Utils
 
 
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MainActivityUITest {

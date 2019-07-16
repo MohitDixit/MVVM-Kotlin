@@ -41,7 +41,6 @@ class MainActivityViewModelTest {
         this.mainActivityViewModel = MainActivityViewModel(repository, utils)
     }
 
-
     @Test
     fun fetchRepositories_API_success() {
 
