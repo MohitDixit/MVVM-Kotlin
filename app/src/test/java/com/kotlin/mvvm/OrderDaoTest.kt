@@ -35,7 +35,7 @@ class OrderDaoTest {
     lateinit var utils: Utils
 
 
-    lateinit var mainActivityViewModel: MainActivityViewModel
+    private lateinit var mainActivityViewModel: MainActivityViewModel
 
     @Before
     fun setUp() {
