@@ -33,6 +33,4 @@ Kotlin - Language
   
 ## License  
   
-This project is licensed under the MIT License
-
-![License]: https://github.com/MohitDixit/MVVM-Kotlin/blob/master/LICENSE
+This project is licensed under the MIT License,see LICENSE file for details.
