@@ -3,7 +3,7 @@
 # MVVM-Kotlin  
   
 It is a MVVM based android code written on kotlin. This app module describes a list of orders with their details in reactive manner.    
-It used latest components for code execution. This android app   
+It used latest components for code execution. This android app has Room db for cache support and offline mode. This code also have unit test cases with Mockito and Espresso. 
   
 ## Features  
   
