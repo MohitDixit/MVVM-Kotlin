@@ -6,6 +6,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import com.kotlin.mvvm.R
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -36,15 +37,16 @@ class NetworkModule {
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
         val cacheDir = File(context.cacheDir, UUID.randomUUID().toString())
-        val cache = Cache(cacheDir, BuildConfig.cacheSize * BuildConfig.cacheUnit * BuildConfig.cacheUnit)
+        val cache = Cache(cacheDir, context.resources.getInteger(R.integer.cacheSize).toLong() * context.resources.getInteger(R.integer.cacheUnit).toLong() * context.resources.getInteger(R.integer.cacheUnit).toLong())
 
-        return OkHttpClient.Builder()
+        val okHttpClient = OkHttpClient.Builder()
             .cache(cache)
-            .connectTimeout(BuildConfig.connTimeout, TimeUnit.SECONDS)
-            .readTimeout(BuildConfig.rwTimeout, TimeUnit.SECONDS)
-            .writeTimeout(BuildConfig.rwTimeout, TimeUnit.SECONDS)
-            .addInterceptor(interceptor)
-            .build()
+            .connectTimeout(context.resources.getInteger(R.integer.connTimeout).toLong(), TimeUnit.SECONDS)
+            .readTimeout(context.resources.getInteger(R.integer.rwTimeout).toLong(), TimeUnit.SECONDS)
+            .writeTimeout(context.resources.getInteger(R.integer.rwTimeout).toLong(), TimeUnit.SECONDS)
+
+        return if(BuildConfig.DEBUG) okHttpClient.addInterceptor(interceptor).build()
+        else okHttpClient.build()
     }
 
     @Provides

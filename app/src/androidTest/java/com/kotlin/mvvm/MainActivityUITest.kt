@@ -8,7 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.kotlin.mvvm.ui.MainActivity
+import com.kotlin.mvvm.ui.main.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.action.ViewActions.swipeDown
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.kotlin.mvvm.api.model.OrderData
-import com.kotlin.mvvm.ui.OrderAdapter
-import com.kotlin.mvvm.util.Utils
+import com.kotlin.mvvm.model.OrderData
+import com.kotlin.mvvm.ui.adapter.OrderAdapter
+import java.io.IOException
 
 
 @RunWith(AndroidJUnit4::class)
@@ -40,10 +40,10 @@ class MainActivityUITest {
     fun recyclerViewListScroll_success() {
 
         val recyclerView = activityRule.activity.findViewById<RecyclerView>(R.id.orderListView)
-        val itemCount = recyclerView.adapter!!.itemCount
+        val itemCount = recyclerView.adapter?.itemCount
 
         onView(withId(R.id.orderListView))
-            .perform(RecyclerViewActions.scrollToPosition<OrderAdapter.ItemViewHolder>(itemCount - 1))
+            .perform(RecyclerViewActions.scrollToPosition<OrderAdapter.ItemViewHolder>(20 - 1))
     }
 
     @Test
@@ -55,13 +55,31 @@ class MainActivityUITest {
         val listType = object : TypeToken<List<OrderData>>() {
         }.type
 
-        val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
+        val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
 
-        onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText(orderList[0].description + BuildConfig.at_str + orderList[0].location?.address)))
+        onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText(orderList[0].description + " at "/*BuildConfig.at_str*/ + orderList[0].location?.address)))
     }
 
     @Test
     fun pullToRefresh_success(){
         onView(withId(R.id.swipe_container)).perform(swipeDown())
+    }
+
+    fun loadJSONFromAssets(): String? {
+        var json: String? = null
+        try {
+            val classLoader = this.javaClass.classLoader
+            val inputStream = classLoader?.getResourceAsStream("mockrepojson.json")
+            val size = inputStream?.available()
+            val buffer = size?.let { ByteArray(it) }
+            inputStream?.read(buffer)
+            inputStream?.close()
+
+            json = buffer?.let { String(it, Charsets.UTF_8) }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return json
     }
 }

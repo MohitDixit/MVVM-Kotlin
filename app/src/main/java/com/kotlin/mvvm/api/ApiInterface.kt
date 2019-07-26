@@ -1,7 +1,7 @@
 package com.kotlin.mvvm.api
 
 import retrofit2.http.GET
-import com.kotlin.mvvm.api.model.OrderData
+import com.kotlin.mvvm.model.OrderData
 import io.reactivex.Single
 import retrofit2.http.Query
 

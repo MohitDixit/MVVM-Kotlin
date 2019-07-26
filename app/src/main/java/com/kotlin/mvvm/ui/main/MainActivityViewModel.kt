@@ -1,11 +1,9 @@
-package com.kotlin.mvvm.ui
-
+package com.kotlin.mvvm.ui.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.kotlin.mvvm.BuildConfig
-import com.kotlin.mvvm.api.model.OrderData
+import com.kotlin.mvvm.model.OrderData
 import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.util.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,6 +20,7 @@ class MainActivityViewModel @Inject constructor(
     var textDescription: String? = null
     var imageUrl: String? = null
     var isLoading: Boolean = false
+    var orderData= OrderData()
 
     var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
     var orderListError: MutableLiveData<String> = MutableLiveData()
@@ -39,7 +38,8 @@ class MainActivityViewModel @Inject constructor(
 
     fun setOrderValue(orderData: OrderData) {
         this.imageUrl = orderData.imageUrl
-        this.textDescription = orderData.description + BuildConfig.at_str + orderData.location?.address
+        this.textDescription = orderData.description + " at " + orderData.location?.address
+        this.orderData = orderData
     }
 
     fun orderListLoader(): LiveData<Boolean> {

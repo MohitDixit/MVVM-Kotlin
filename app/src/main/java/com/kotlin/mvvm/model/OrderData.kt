@@ -1,4 +1,4 @@
-package com.kotlin.mvvm.api.model
+package com.kotlin.mvvm.model
 
 import androidx.room.*
 import com.google.gson.annotations.Expose

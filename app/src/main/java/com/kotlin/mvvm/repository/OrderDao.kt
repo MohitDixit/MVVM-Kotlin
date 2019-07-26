@@ -1,7 +1,7 @@
 package com.kotlin.mvvm.repository
 
 import androidx.room.*
-import com.kotlin.mvvm.api.model.OrderData
+import com.kotlin.mvvm.model.OrderData
 import io.reactivex.Single
 
 @Dao

@@ -4,7 +4,7 @@
 
         <variable
                 name="mainActivityViewModel"
-                type="com.kotlin.mvvm.ui.MainActivityViewModel"/>
+                type="com.kotlin.mvvm.ui.main.MainActivityViewModel"/>
     </data>
     <RelativeLayout
             android:orientation="vertical"
@@ -15,13 +15,14 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
         />
-        <FrameLayout
-                android:id="@+id/map"
-                android:layout_width="match_parent"
-                android:layout_above="@+id/bottom"
-                android:layout_below="@+id/toolbar"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_height="match_parent"/>
+        <com.google.android.gms.maps.MapView
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:id="@+id/map"
+                  initMap="@{mainActivityViewModel}"
+                  android:layout_above="@+id/bottom"
+                  android:layout_below="@+id/toolbar"
+                  android:name="com.google.android.gms.maps.SupportMapFragment" />
         <include
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

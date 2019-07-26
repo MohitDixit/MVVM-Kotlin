@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="limit">20</integer>
+    <integer name="connTimeout">30</integer>
+    <integer name="rwTimeout">60</integer>
+    <integer name="cacheSize">10</integer>
+    <integer name="cacheUnit">1024</integer>
+
+
+</resources>

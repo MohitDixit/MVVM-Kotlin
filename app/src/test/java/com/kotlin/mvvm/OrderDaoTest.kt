@@ -3,10 +3,10 @@ package com.kotlin.mvvm
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.kotlin.mvvm.api.model.OrderData
+import com.kotlin.mvvm.model.OrderData
 import com.kotlin.mvvm.repository.OrderDao
 import com.kotlin.mvvm.repository.OrderListRepository
-import com.kotlin.mvvm.ui.MainActivityViewModel
+import com.kotlin.mvvm.ui.main.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
 import com.nhaarman.mockitokotlin2.verify
 import io.reactivex.Single
@@ -17,6 +17,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -34,6 +35,8 @@ class OrderDaoTest {
     @Mock
     lateinit var utils: Utils
 
+    private val offset: Int = 0
+    private val limit : Int = 20
 
     private lateinit var mainActivityViewModel: MainActivityViewModel
 
@@ -42,7 +45,7 @@ class OrderDaoTest {
         MockitoAnnotations.initMocks(this)
         orderDao = Mockito.mock(OrderDao::class.java)
         repository = Mockito.mock(OrderListRepository::class.java)
-        mainActivityViewModel =  MainActivityViewModel(repository, utils)
+        mainActivityViewModel = MainActivityViewModel(repository, utils)
 
     }
 
@@ -55,8 +58,8 @@ class OrderDaoTest {
             val listType = object : TypeToken<List<OrderData>>() {
             }.type
 
-            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-            Mockito.`when`(this.repository.getDataFromApi(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+            val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
+            Mockito.`when`(this.repository.getDataFromApi(offset, limit)).thenAnswer {
                 return@thenAnswer Single.just(orderList)
             }
 
@@ -78,17 +81,17 @@ class OrderDaoTest {
            val listType = object : TypeToken<List<OrderData>>() {
            }.type
 
-           val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-           Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+           val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
+           Mockito.`when`(this.repository.getOrderListFromDb(offset, limit)).thenAnswer {
                return@thenAnswer Single.just(orderList)
            }
 
-           orderDao.getAll(BuildConfig.offset_mock, BuildConfig.limit)
+           orderDao.getAll(offset, limit)
 
            Assert.assertNotNull(this.mainActivityViewModel.orderListResult.value)
            Assert.assertEquals(orderList, this.mainActivityViewModel.orderListResult.value)
 
-           verify(orderDao).getAll(BuildConfig.offset_mock, BuildConfig.limit)
+           verify(orderDao).getAll(offset, limit)
        }
     }
 
@@ -101,8 +104,8 @@ class OrderDaoTest {
             val listType = object : TypeToken<List<OrderData>>() {
             }.type
 
-            val orderList: List<OrderData> = Gson().fromJson(Utils.loadJSONFromAssets(), listType)
-            Mockito.`when`(this.repository.getOrderListFromDb(BuildConfig.offset_mock, BuildConfig.limit)).thenAnswer {
+            val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
+            Mockito.`when`(this.repository.getOrderListFromDb(offset, limit)).thenAnswer {
                 return@thenAnswer Single.just(orderList)
             }
 
@@ -116,5 +119,21 @@ class OrderDaoTest {
 
     }
 
+    fun loadJSONFromAssets(): String? {
+        var json: String? = null
+        try {
+            val classLoader = this.javaClass.classLoader
+            val inputStream = classLoader?.getResourceAsStream("mockrepojson.json")
+            val size = inputStream?.available()
+            val buffer = size?.let { ByteArray(it) }
+            inputStream?.read(buffer)
+            inputStream?.close()
 
+            json = buffer?.let { String(it, Charsets.UTF_8) }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return json
+    }
 }

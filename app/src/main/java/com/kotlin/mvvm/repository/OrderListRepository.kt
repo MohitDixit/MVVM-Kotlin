@@ -1,7 +1,7 @@
 package com.kotlin.mvvm.repository
 
 import com.kotlin.mvvm.api.ApiInterface
-import com.kotlin.mvvm.api.model.OrderData
+import com.kotlin.mvvm.model.OrderData
 import com.kotlin.mvvm.util.Utils
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,16 +19,11 @@ class OrderListRepository @Inject constructor(
 
     fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Single<List<OrderData>> {
         val hasConnection = utils.isConnectedToInternet()
-        var observableFromApi: Single<List<OrderData>>? = null
-        if (!isFromDB) {
-            if (hasConnection) {
-                observableFromApi = getDataFromApi(offset, limit)
-            }
-        }
+        val observableFromApi: Single<List<OrderData>> = getDataFromApi(offset, limit)
         val observableFromDb = getOrderListFromDb(offset, limit)
 
-        return (if (!isFromDB && hasConnection) observableFromApi
-        else observableFromDb)!!
+        return if (!isFromDB && hasConnection) observableFromApi
+        else observableFromDb
 
     }
 

@@ -3,6 +3,7 @@ package com.kotlin.mvvm.util
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
@@ -10,7 +11,6 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.kotlin.mvvm.R
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -46,29 +46,6 @@ class Utils @Inject constructor(private val context: Context) {
         return false
     }
 
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    companion object {
-        @JvmStatic
-        fun loadJSONFromAssets(): String? {
-            var json: String? = null
-            try {
-                val classLoader = this.javaClass.classLoader
-                val inputStream = classLoader?.getResourceAsStream("mockrepojson.json")
-                val size = inputStream?.available()
-                val buffer = size?.let { ByteArray(it) }
-                inputStream?.read(buffer)
-                inputStream?.close()
-
-                json = buffer?.let { String(it, Charsets.UTF_8) }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-
-            return json
-        }
-
-    }
-
     internal fun showNetworkAlert(activity: AppCompatActivity) {
 
         val dialogBuilder = AlertDialog.Builder(activity)
@@ -79,7 +56,7 @@ class Utils @Inject constructor(private val context: Context) {
                 context.startActivity(
                     Intent(
                         Settings.ACTION_WIFI_SETTINGS
-                    )
+                    ).addFlags(FLAG_ACTIVITY_NEW_TASK)
                 )
             }
 

@@ -9,4 +9,8 @@
     <string name="no_order_available">No Order Available</string>
     <string name="no_more_order">No more orders available</string>
     <string name="try_again">Try Again!</string>
+    <string name="order_list">order_list</string>
+    <string name="my_order">My Orders</string>
+    <string name="order_details">Order Details</string>
+
 </resources>
