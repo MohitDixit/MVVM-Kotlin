@@ -5,6 +5,7 @@ import com.squareup.picasso.Picasso
 import androidx.databinding.BindingAdapter
 import com.google.android.gms.maps.model.MarkerOptions
 import android.os.Bundle
+import android.view.View
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -19,12 +20,12 @@ const val imgDimen = 200
 @BindingAdapter("bind:imageUrl")
 fun loadImage(imageView: ImageView, url: String?) {
     if (!url.isNullOrEmpty()) {
-        Picasso.with(imageView.context).load(url).resize(
+        Picasso.get().load(url).resize(
             imgDimen,
             imgDimen
         ).into(imageView)
     } else {
-        Picasso.with(imageView.context).load(R.drawable.no_image_found).resize(
+        Picasso.get().load(R.drawable.no_image_found).resize(
             imgDimen,
             imgDimen
         ).into(imageView)
@@ -48,4 +49,10 @@ fun initMap(mapView: MapView, mainActivityViewModel: MainActivityViewModel) {
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         googleMap.uiSettings?.isZoomControlsEnabled = true
     }
+}
+@BindingAdapter("visibility")
+fun showHideView(view: View, isShow: Boolean) {
+    view.visibility = if (isShow) {
+        View.VISIBLE
+    } else View.GONE
 }

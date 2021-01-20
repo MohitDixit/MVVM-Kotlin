@@ -4,7 +4,7 @@
     <data>
 
         <variable
-                name="mainActivityViewModel"
+                name="mainViewModel"
                 type="com.kotlin.mvvm.ui.main.MainActivityViewModel"/>
     </data>
     <LinearLayout

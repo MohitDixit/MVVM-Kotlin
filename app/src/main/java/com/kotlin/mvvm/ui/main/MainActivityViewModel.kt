@@ -3,12 +3,11 @@ package com.kotlin.mvvm.ui.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.kotlin.mvvm.model.OrderData
 import com.kotlin.mvvm.repository.OrderListRepository
 import com.kotlin.mvvm.util.Utils
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableSingleObserver
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(
@@ -17,27 +16,27 @@ class MainActivityViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    var textDescription: String? = null
-    var imageUrl: String? = null
-    var isLoading: Boolean = false
-    var orderData= OrderData()
+    lateinit var textDescription: String
+    lateinit var imageUrl: String
+    private var isLoading: Boolean = false
+    var orderData = OrderData()
 
-    var orderListResult: MutableLiveData<List<OrderData>> = MutableLiveData()
-    var orderListError: MutableLiveData<String> = MutableLiveData()
-    var orderListLoader: MutableLiveData<Boolean> = MutableLiveData()
-    private lateinit var disposableObserver: DisposableSingleObserver<List<OrderData>>
-
+    val orderListResult by lazy { MutableLiveData<List<OrderData>>() }
+    private val orderListError by lazy { MutableLiveData<Throwable>() }
+    private val orderListLoader by lazy { MutableLiveData<Boolean>() }
+    private val isListShow by lazy { MutableLiveData<Boolean>() }
+    private val isErrorShow by lazy { MutableLiveData<Boolean>() }
 
     fun orderListResult(): LiveData<List<OrderData>> {
         return orderListResult
     }
 
-    fun orderListError(): LiveData<String> {
+    fun orderListError(): LiveData<Throwable> {
         return orderListError
     }
 
     fun setOrderValue(orderData: OrderData) {
-        this.imageUrl = orderData.imageUrl
+        this.imageUrl = orderData.imageUrl.toString()
         this.textDescription = orderData.description + " at " + orderData.location?.address
         this.orderData = orderData
     }
@@ -49,6 +48,9 @@ class MainActivityViewModel @Inject constructor(
     fun deleteOrderDB() {
         orderListRepository.getEmptyDb()
     }
+    fun insertAfterApiSuccess(list: List<OrderData>) {
+        orderListRepository.insertAfterApiSuccess(list)
+    }
 
     fun insertAfterPullToRefresh(list: List<OrderData>) {
         orderListRepository.insertAfterPullToRefresh(list)
@@ -56,37 +58,45 @@ class MainActivityViewModel @Inject constructor(
 
     fun loadOrderList(offset: Int, limit: Int, isFromDB: Boolean) {
 
-        disposableObserver = object : DisposableSingleObserver<List<OrderData>>() {
-            override fun onSuccess(orders: List<OrderData>) {
+        viewModelScope.launch {
+            try {
+                var orders: List<OrderData>? = null
+                orderListRepository.getDataFromApi(offset, limit).doAfterSuccess {
+                    orders = it
+                }/*getOrderList(offset, limit, isFromDB)*/
                 orderListResult.postValue(orders)
-                orderListLoader.postValue(false)
-
-                if (isFromDB && orders.isEmpty() && !isLoading) {
+                if (isFromDB && orders!!.isEmpty() && !isLoading) {
                     if (utils.isConnectedToInternet()) {
                         isLoading = true
 
                         loadOrderList(offset, limit, false)
                     }
-                } else if (orders.isNotEmpty()) {
+                } else if (orders!!.isNotEmpty()) {
                     isLoading = false
-                } else if (!isFromDB && orders.isEmpty() && isLoading) {
+                } else if (!isFromDB && orders!!.isEmpty() && isLoading) {
                     isLoading = false
                 }
-
-            }
-
-            override fun onError(e: Throwable) {
-                orderListError.postValue(e.message)
+                setViewIndicators(isOK = true)
+            } catch (e: Throwable) {
+                orderListError.postValue(e)
+                setViewIndicators(isOK = false)
+            } finally {
+                setLoadingIndicators(isLoad = false)
                 orderListLoader.postValue(false)
-                isLoading = false
+
             }
-
         }
-
-        orderListRepository.getOrderList(offset, limit, isFromDB)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(disposableObserver)
     }
 
+    private fun setViewIndicators(isOK: Boolean) {
+        isListShow.postValue(isOK)
+        isErrorShow.postValue(!isOK)
+    }
+
+    private fun setLoadingIndicators(isLoad: Boolean) {
+        isLoading = isLoad
+        when (isLoad) {
+            true -> isErrorShow.postValue(!isLoad)
+        }
+    }
 }

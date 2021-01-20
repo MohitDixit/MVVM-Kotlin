@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.kotlin.mvvm.model.OrderData
 import android.content.Intent
 import androidx.databinding.DataBindingUtil
 import com.kotlin.mvvm.databinding.OrderListItemBinding
 import com.kotlin.mvvm.databinding.ProgressBarBinding
+import com.kotlin.mvvm.model.OrderData
 import com.kotlin.mvvm.ui.detail.OrderDetailActivity
 import com.kotlin.mvvm.ui.main.MainActivityViewModel
 import java.io.Serializable

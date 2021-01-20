@@ -17,9 +17,9 @@ class OrderListRepository @Inject constructor(
     private val utils: Utils
 ) {
 
-    fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Single<List<OrderData>> {
+   suspend fun getOrderList(offset: Int, limit: Int, isFromDB: Boolean): Single<List<OrderData>> {
         val hasConnection = utils.isConnectedToInternet()
-        val observableFromApi: Single<List<OrderData>> = getDataFromApi(offset, limit)
+        val observableFromApi = getDataFromApi(offset, limit)
         val observableFromDb = getOrderListFromDb(offset, limit)
 
         return if (!isFromDB && hasConnection) observableFromApi
@@ -27,7 +27,7 @@ class OrderListRepository @Inject constructor(
 
     }
 
-    internal fun getDataFromApi(offset: Int, limit: Int): Single<List<OrderData>> {
+    internal suspend fun getDataFromApi(offset: Int, limit: Int): Single<List<OrderData>> {
         return apiInterface.getJsonResponse(offset, limit).doAfterSuccess {
             if (it.isNotEmpty()) {
                 orderDao.insert(it)
@@ -42,6 +42,13 @@ class OrderListRepository @Inject constructor(
     fun getEmptyDb() {
         Completable.fromAction(orderDao::emptyTable)
             .subscribeOn(Schedulers.single())
+            .subscribe()
+    }
+    fun insertAfterApiSuccess(list: List<OrderData>) {
+        Completable.fromRunnable {
+            orderDao.insert(list)
+        }
+            .subscribeOn(Schedulers.io())
             .subscribe()
     }
 

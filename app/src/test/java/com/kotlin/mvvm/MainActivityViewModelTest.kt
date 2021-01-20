@@ -9,6 +9,7 @@ import com.kotlin.mvvm.ui.main.MainActivityViewModel
 import com.kotlin.mvvm.util.Utils
 import com.nhaarman.mockitokotlin2.verify
 import io.reactivex.Single
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -53,9 +54,12 @@ class MainActivityViewModelTest {
             }.type
 
             val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
-            Mockito.`when`(this.repository.getDataFromApi(offset, limit)).thenAnswer {
-                return@thenAnswer Single.just(orderList)
+            runBlockingTest {
+                Mockito.`when`(repository.getDataFromApi(offset, limit)).thenAnswer {
+                    return@thenAnswer Single.just(orderList)
+                }
             }
+
 
             this.mainActivityViewModel.loadOrderList(offset, limit, isFromDB = false)
 
@@ -73,8 +77,10 @@ class MainActivityViewModelTest {
             }.type
 
             val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
-            Mockito.`when`(this.repository.getDataFromApi(offset, limit)).thenAnswer {
-                return@thenAnswer Single.just(orderList)
+            runBlockingTest {
+                Mockito.`when`(repository.getDataFromApi(offset, limit)).thenAnswer {
+                    return@thenAnswer Single.just(orderList)
+                }
             }
 
             this.mainActivityViewModel.loadOrderList(offset, limit, isFromDB = true)
@@ -85,7 +91,7 @@ class MainActivityViewModelTest {
         }
     }
 
-    fun loadJSONFromAssets(): String? {
+    private fun loadJSONFromAssets(): String? {
         var json: String? = null
         try {
             val classLoader = this.javaClass.classLoader

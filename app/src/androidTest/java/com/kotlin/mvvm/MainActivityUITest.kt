@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.action.ViewActions.swipeDown
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.kotlin.mvvm.model.OrderData
+import com.kotlin.mvvm.model.OrderData2
 import com.kotlin.mvvm.ui.adapter.OrderAdapter
 import java.io.IOException
 
@@ -52,10 +52,10 @@ class MainActivityUITest {
         onView(withId(R.id.orderListView))
             .perform(RecyclerViewActions.actionOnItemAtPosition<OrderAdapter.ItemViewHolder>(0, click()))
 
-        val listType = object : TypeToken<List<OrderData>>() {
+        val listType = object : TypeToken<List<OrderData2>>() {
         }.type
 
-        val orderList: List<OrderData> = Gson().fromJson(loadJSONFromAssets(), listType)
+        val orderList: List<OrderData2> = Gson().fromJson(loadJSONFromAssets(), listType)
 
         onView(withId(R.id.order_description)).check(matches(ViewMatchers.withText(orderList[0].description + " at "/*BuildConfig.at_str*/ + orderList[0].location?.address)))
     }

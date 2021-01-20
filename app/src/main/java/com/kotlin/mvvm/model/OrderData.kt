@@ -1,48 +1,10 @@
 package com.kotlin.mvvm.model
 
-import androidx.room.*
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity
-class OrderData : Serializable {
-
-    @SerializedName("id")
-    @Expose
-    @PrimaryKey
-    @ColumnInfo(name = "id")
-    var id: Int? = null
-
-    @SerializedName("description")
-    @Expose
-    @ColumnInfo(name = "description")
-    var description: String? = null
-
-    @SerializedName("imageUrl")
-    @Expose
-    @ColumnInfo(name = "imageUrl")
-    var imageUrl: String? = null
-
-    @SerializedName("location")
-    @Expose
-    @Embedded
-    var location: Location? = null
-
-    class Location : Serializable {
-
-        @SerializedName("lat")
-        @Expose
-        var lat: String? = null
-
-        @SerializedName("lng")
-        @Expose
-        var lng: String? = null
-
-        @SerializedName("address")
-        @Expose
-        var address: String? = null
-    }
-}
+data class OrderData(@PrimaryKey var id:Int = 1, val userId:Int = 1, var description:String ="description", var imageUrl:String ="", @Embedded var location:Location = Location("","",""))
+data class Location(var lat:String="", var lng:String="", var address:String="")
 
